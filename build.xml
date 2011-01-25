@@ -99,6 +99,15 @@ the common tasks and can be called on to run the main aspects of all the sub-scr
     <mkdir dir="dist" />
     <jar destfile="dist/tinybinding.jar">
       <fileset dir="build/tinybinding" />
+      <zipfileset src="lib/build/fest-reflect.jar">
+        <exclude name="**/constructor/**" />
+        <exclude name="**/field/**" />
+        <exclude name="**/innerclass/**" />
+      </zipfileset>
+      <zipfileset src="lib/build/fest-util.jar">
+        <include name="**/Array*.class" />
+        <include name="**/String*.class" />
+      </zipfileset>
       <fileset dir="." includes="LICENSE" />
       <fileset dir="." includes="FEST_LICENSE" />
     </jar>
