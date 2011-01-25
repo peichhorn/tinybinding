@@ -27,7 +27,7 @@ package de.fips.util.tinybinding;
  * @author Philipp Eichhorn
  */
 public final class Version {
-	private static final String VERSION = "1.0.1";
+	private static final String VERSION = "1.0.2-HEAD";
 	
 	private Version() {
 	}
