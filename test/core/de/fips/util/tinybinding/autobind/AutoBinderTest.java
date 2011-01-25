@@ -32,7 +32,9 @@ import javax.swing.SpinnerNumberModel;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import de.fips.util.tinybinding.DataBindingContext;
 import de.fips.util.tinybinding.IObservableValue;
@@ -47,6 +49,8 @@ import de.fips.util.tinybinding.autobind.Model;
  * @author Philipp Eichhorn
  */
 public class AutoBinderTest {
+	@Rule public ExpectedException thrown = ExpectedException.none();
+	
 	private TestModel model;
 	private TestModel2 model2;
 	private TestForm form;
@@ -69,7 +73,7 @@ public class AutoBinderTest {
 	}
 
 	@Test
-	public void test_bind() throws Exception {
+	public void test_bind() throws NoSuchFieldException {
 		context = AutoBinder.bind(model, form);
 		form.text.setText("All new input");
 		assertThat(model.text.get()).isEqualTo("All new input");
@@ -78,7 +82,7 @@ public class AutoBinderTest {
 	}
 
 	@Test
-	public void test_bind_subclassing() throws Exception {
+	public void test_bind_subclassing() throws NoSuchFieldException {
 		context = AutoBinder.bind(model2, form2);
 		form2.text.setText("All new input");
 		assertThat(model2.text.get()).isEqualTo("All new input");
@@ -88,13 +92,14 @@ public class AutoBinderTest {
 		assertThat((Double)form2.value.getValue()).isEqualTo(33.3);
 	}
 
-	@Test(expected = NoSuchFieldException.class)
+	@Test
 	public void test_bind_missingFormField() throws Exception {
+		thrown.expect(NoSuchFieldException.class);
 		context = AutoBinder.bind(model2, form);
 	}
 
 	@Test
-	public void test_bind_extraFormField() throws Exception {
+	public void test_bind_extraFormField() throws NoSuchFieldException {
 		context = AutoBinder.bind(model, form2);
 		form2.text.setText("All new input");
 		assertThat(model.text.get()).isEqualTo("All new input");
@@ -102,23 +107,27 @@ public class AutoBinderTest {
 		assertThat(form2.status.isSelected()).isTrue();
 	}
 
-	@Test(expected = NullPointerException.class)
-	public void test_bind_nullValues1() throws Exception {
+	@Test
+	public void test_bind_nullValues1() throws NoSuchFieldException {
+		thrown.expect(NullPointerException.class);
 		context = AutoBinder.bind(null, form2);
 	}
 
-	@Test(expected = NullPointerException.class)
-	public void test_bind_nullValues2() throws Exception {
+	@Test
+	public void test_bind_nullValues2() throws NoSuchFieldException {
+		thrown.expect(NullPointerException.class);
 		context = AutoBinder.bind(model, null);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void test_bind_missingAnnotation1() throws Exception {
+	@Test
+	public void test_bind_missingAnnotation1() throws NoSuchFieldException {
+		thrown.expect(IllegalArgumentException.class);
 		context = AutoBinder.bind("", form2);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void test_bind_missingAnnotation2() throws Exception {
+	@Test
+	public void test_bind_missingAnnotation2() throws NoSuchFieldException {
+		thrown.expect(IllegalArgumentException.class);
 		context = AutoBinder.bind(model, "");
 	}
 

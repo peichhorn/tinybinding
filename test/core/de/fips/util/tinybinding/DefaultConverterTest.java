@@ -23,7 +23,9 @@ package de.fips.util.tinybinding;
 
 import static org.fest.assertions.Assertions.assertThat;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * Tests the {@link DefaultConverter}.
@@ -31,6 +33,8 @@ import org.junit.Test;
  * @author Philipp Eichhorn
  */
 public class DefaultConverterTest {
+	@Rule public ExpectedException thrown = ExpectedException.none();
+	
 	@Test
 	public void test_convert() {
 		DefaultConverter<Integer, Number> converter = new DefaultConverter<Integer, Number>();
@@ -38,9 +42,10 @@ public class DefaultConverterTest {
 		assertThat(num).isNotNull();
 	}
 
-	@Test(expected = ClassCastException.class)
+	@Test
 	public void test_convert_invalidType() {
 		DefaultConverter<Integer, String> converter = new DefaultConverter<Integer, String>();
+		thrown.expect(ClassCastException.class);
 		System.out.println(converter.convert(Integer.valueOf(10)));
 	}
 }
