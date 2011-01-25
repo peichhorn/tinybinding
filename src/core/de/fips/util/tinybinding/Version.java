@@ -35,7 +35,7 @@ public final class Version {
 	/** Prints the version followed by a newline, and exits. */
 	public static void main(String[] args) {
 		if (args.length > 0) {
-			System.out.printf("tinyargs %s", getVersion());
+			System.out.printf("tinybinding %s", getVersion());
 		} else {
 			System.out.println(VERSION);
 		}

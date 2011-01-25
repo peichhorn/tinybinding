@@ -48,10 +48,9 @@ public final class Reflection {
 		wrapperToPrimitive.put(Void.class, Void.TYPE);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T, S> Class<T> getPrimitive(final Class<S> clazz) {
 		if (clazz == null) return null;
-		return (Class<T>) wrapperToPrimitive.get(clazz);
+		return Cast.<Class<T>>uncheckedCast(wrapperToPrimitive.get(clazz));
 	}
 
 	public static boolean hasPrimitive(final Class<?> clazz) {
