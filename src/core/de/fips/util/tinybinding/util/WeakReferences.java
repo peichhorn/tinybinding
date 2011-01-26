@@ -73,7 +73,7 @@ public final class WeakReferences {
 		if (weakListener == null) {
 			throw new IllegalArgumentException("Unknown listener type '" + listenerType + "'.");
 		}
-		return Cast.<T>uncheckedCast(weakListener);
+		return listenerType.cast(weakListener);
 	}
 
 	private static class WeakActionListener extends AbstractWeakListener<ActionListener, ActionEvent> implements ActionListener {
