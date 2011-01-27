@@ -21,11 +21,13 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding;
 
+import static lombok.With.with;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
+import javax.swing.AbstractAction;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -37,7 +39,7 @@ import lombok.SwingInvokeLater;
 
 public class DemoLauncher implements Application {
 
-	public Class<?>[] getDemoClasses() {
+	public static Class<?>[] getDemoClasses() {
 		return new Class<?>[] {SimpleDemo.class, SearchDemo.class};
 	}
 	
@@ -54,25 +56,32 @@ public class DemoLauncher implements Application {
 		final JComboBox combobox = new JComboBox();
 		combobox.setPreferredSize(new Dimension(150, combobox.getPreferredSize().height));
 		combobox.setModel(getComboBoxModel());
-		final JButton launchButton = new JButton("Launch");
-		final JFrame frame = new JFrame("DemoLauncher");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(new BorderLayout(5, 5));
-		frame.getContentPane().add(combobox, BorderLayout.WEST);
-		frame.getContentPane().add(launchButton, BorderLayout.EAST);
-		frame.pack();
-		frame.setVisible(true);
+		with(new JFrame("DemoLauncher"),
+			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE),
+			setLayout(new BorderLayout(5, 5)),
+			getContentPane().add(combobox, BorderLayout.WEST),
+			getContentPane().add(new JButton(new LaunchAction(combobox)), BorderLayout.EAST),
+			pack(),
+			setVisible(true));
 		
-		launchButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent event) {
-				Class<?> clazz = getDemoClasses()[combobox.getSelectedIndex()];
-				try {
-					clazz.getMethod("main", String[].class).invoke(null, new Object[] {new String[0]});
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+	}
+	
+	public static class LaunchAction extends AbstractAction {
+		private final JComboBox combobox;
+		
+		public LaunchAction(final JComboBox combobox) {
+			super("Launch");
+			this.combobox = combobox;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent event) {
+			Class<?> clazz = getDemoClasses()[combobox.getSelectedIndex()];
+			try {
+				clazz.getMethod("main", String[].class).invoke(null, new Object[] {new String[0]});
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		});
+		}
 	}
 }

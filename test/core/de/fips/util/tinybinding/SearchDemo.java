@@ -21,6 +21,7 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding;
 
+import static lombok.With.with;
 import static de.fips.util.tinybinding.Observables.observe;
 
 import java.awt.BorderLayout;
@@ -51,13 +52,13 @@ import lombok.SwingInvokeLater;
 public class SearchDemo implements Application {
 
 	@SwingInvokeLater
-	public void runApp(final String[] arg0) throws Throwable {
-		final JFrame frame = new JFrame("Search Demo");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(new BorderLayout());
-		frame.getContentPane().add(new SearchDemoViewLogic().createView(), BorderLayout.CENTER);
-		frame.pack();
-		frame.setVisible(true);	
+	public void runApp(final String[] args) throws Throwable {
+		with(new JFrame("Search Demo"),
+			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE),
+			setLayout(new BorderLayout()),
+			getContentPane().add(new SearchDemoViewLogic().createView(), BorderLayout.CENTER),
+			pack(),
+			setVisible(true));
 	}
 	
 	public static class SearchDemoView extends JPanel {
@@ -92,7 +93,7 @@ public class SearchDemo implements Application {
 			model = new DefaultComboBoxModel();
 			model.addElement("Bing");
 			model.addElement("Google");
-			model.addElement("Yahoo");	
+			model.addElement("Yahoo");
 			action = new SearchAction();
 		}
 

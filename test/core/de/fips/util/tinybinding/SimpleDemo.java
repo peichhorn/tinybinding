@@ -21,16 +21,18 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding;
 
+import static javax.swing.JOptionPane.*;
+import static lombok.With.with;
+
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -53,29 +55,36 @@ public class SimpleDemo implements Application {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		final JButton loginButton = new JButton("login");
-		final JFrame frame = new JFrame("Simple Demo");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(new BorderLayout());
-		frame.getContentPane().add(form, BorderLayout.CENTER);
-		frame.getContentPane().add(loginButton, BorderLayout.SOUTH);
-		frame.pack();
-		frame.setVisible(true);
+		with(new JFrame("Simple Demo"),
+			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE),
+			setLayout(new BorderLayout()),
+			getContentPane().add(form, BorderLayout.CENTER),
+			getContentPane().add(new JButton(new LoginAction(model)), BorderLayout.SOUTH),
+			pack(),
+			setResizable(false),
+			setVisible(true));
+	}
+	
+	public static class LoginAction extends AbstractAction {
+		private final LoginModel model;
 		
-		loginButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				if ("user".equals(model.loginName.get()) && "1234".equals(model.password.get())) {
-					if (model.autologin.get()) {
-						JOptionPane.showMessageDialog(frame, "Login succeed - Auto Login active", "Success", JOptionPane.INFORMATION_MESSAGE);
-					} else {
-						JOptionPane.showMessageDialog(frame, "Login succeed", "Success", JOptionPane.INFORMATION_MESSAGE);
-					}
+		public LoginAction(final LoginModel model) {
+			super("Login");
+			this.model = model;
+		}
+		
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			if ("user".equals(model.loginName.get()) && "1234".equals(model.password.get())) {
+				if (model.autologin.get()) {
+					showMessageDialog(null, "Login succeed - Auto Login active", "Success", INFORMATION_MESSAGE);
 				} else {
-					JOptionPane.showMessageDialog(frame, "Login Failed", "Failure", JOptionPane.WARNING_MESSAGE);
+					showMessageDialog(null, "Login succeed", "Success", INFORMATION_MESSAGE);
 				}
+			} else {
+				showMessageDialog(null, "Login Failed", "Failure", WARNING_MESSAGE);
 			}
-		});
+		}
 	}
 	
 	@Form
