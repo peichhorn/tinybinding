@@ -24,14 +24,14 @@ package de.fips.util.tinybinding;
 /**
  * Implementations of this interface are capable of receiving data changes
  * of a {@link java.util.Map Map} data-structure.
- * 
+ *
  * @author Philipp Eichhorn
  */
-public interface IMapObserver<K, V> {
+public interface IMapObserver<KEY_TYPE, VALUE_TYPE> {
 
-	public void valueChanged(IObservableMap<K, V> map, K key, V lastValue);
+	public void valueChanged(IObservableMap<KEY_TYPE, VALUE_TYPE> map, KEY_TYPE key, VALUE_TYPE lastValue);
 
-	public void valueAdded(IObservableMap<K, V> map, K key);
+	public void valueAdded(IObservableMap<KEY_TYPE, VALUE_TYPE> map, KEY_TYPE key);
 
-	public void valueRemoved(IObservableMap<K, V> map, K key, V value);
+	public void valueRemoved(IObservableMap<KEY_TYPE, VALUE_TYPE> map, KEY_TYPE key, VALUE_TYPE value);
 }

@@ -36,14 +36,14 @@ import de.fips.util.tinybinding.IObservableValue;
 import de.fips.util.tinybinding.ObservableValue;
 
 /**
- * Creates {@link ObservableValue} for Swing Components. 
- * 
+ * Creates {@link ObservableValue} for Swing Components.
+ *
  * @author Philipp Eichhorn
  */
 @RequiredArgsConstructor
-public class SwingObservable {
+public final class SwingObservable {
 	private final Container source;
-	
+
 	public IObservableValue<Color> background() {
 		return new ObservablePropertyValue<Color>("background", Color.class, source);
 	}

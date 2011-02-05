@@ -29,54 +29,57 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * 
+ *
  * @author Philipp Eichhorn
  */
 @ToString(of="value")
 @NoArgsConstructor(access=AccessLevel.PROTECTED)
-public class ObservableValue<T> implements IObservableValue<T> {
-	private T value;
-	private final List<IValueObserver<T>> registeredObservers = new CopyOnWriteArrayList<IValueObserver<T>>();
+public class ObservableValue<TYPE> implements IObservableValue<TYPE> {
+	private TYPE value;
+	private final List<IValueObserver<TYPE>> registeredObservers = new CopyOnWriteArrayList<IValueObserver<TYPE>>();
 
-	protected ObservableValue(final T value) {
+	protected ObservableValue(final TYPE value) {
 		this.value = value;
 	}
-	
-	public T get() {
+
+	@Override
+	public final TYPE get() {
 		return value;
 	}
-	
-	public boolean set(final T value) {
-		T oldValue = get();
+
+	@Override
+	public final boolean set(final TYPE value) {
+		TYPE oldValue = get();
 		boolean valueIsNull = value == null;
 		boolean oldValueIsNull = oldValue == null;
 		boolean valueChanged = (oldValueIsNull && !valueIsNull) || (valueIsNull && !oldValueIsNull)
 				|| ((value == oldValue) ? false : !value.equals(oldValue));
 		if (valueChanged) {
-			try {
-				doSet(value);
-			} catch (VetoException ignore) {
-			}
+			this.value = value;
+			doSet(value);
 			notifyObserver(value, oldValue);
 		}
 		return valueChanged;
 	}
-	
-	protected void doSet(final T value) throws VetoException {
-		this.value = value;
+
+	/** Hook for subclasses */
+	protected void doSet(final TYPE value) {
+		// Subclasses may use to hook to call their own setter
 	}
-	
-	protected void notifyObserver(final T newValue, final T oldValue) {
-		for (IValueObserver<T> observer : registeredObservers) {
+
+	protected final void notifyObserver(final TYPE newValue, final TYPE oldValue) {
+		for (final IValueObserver<TYPE> observer : registeredObservers) {
 			observer.valueChanged(newValue, oldValue);
 		}
 	}
 
-	public void addObserver(final IValueObserver<T> observer) {
+	@Override
+	public final void addObserver(final IValueObserver<TYPE> observer) {
 		addObserver(observer, true);
 	}
 
-	public void addObserver(final IValueObserver<T> observer, final boolean emitValueChanged) {
+	@Override
+	public final void addObserver(final IValueObserver<TYPE> observer, final boolean emitValueChanged) {
 		if (!registeredObservers.contains(observer)) {
 			registeredObservers.add(observer);
 		}
@@ -85,19 +88,16 @@ public class ObservableValue<T> implements IObservableValue<T> {
 		}
 	}
 
-	public void removeObserver(final IValueObserver<T> observer) {
+	@Override
+	public final void removeObserver(final IValueObserver<TYPE> observer) {
 		registeredObservers.remove(observer);
 	}
 
-	public static class VetoException extends RuntimeException {
-		private static final long serialVersionUID = -3160482313228995937L;
+	public static <TYPE> ObservableValue<TYPE> of(final TYPE value) {
+		return new ObservableValue<TYPE>(value);
 	}
-	
-	public static <T> ObservableValue<T> of(final T value) {
-		return new ObservableValue<T>(value);
-	}
-	
-	public static <T> ObservableValue<T> nil() {
-		return new ObservableValue<T>();
+
+	public static <TYPE> ObservableValue<TYPE> nil() {
+		return new ObservableValue<TYPE>();
 	}
 }

@@ -47,12 +47,12 @@ import lombok.NoArgsConstructor;
 
 /**
  * Creates all kinds of useful {@link WeakReference WeakReferences}.
- * 
+ *
  * @author Philipp Eichhorn
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class WeakReferences {
-	
+
 	public static <T> T weakListener(final Class<T> listenerType, final T listener, final Object source) {
 		Object weakListener = null;
 		if (ActionListener.class.isAssignableFrom(listenerType)) {
@@ -71,7 +71,7 @@ public final class WeakReferences {
 			weakListener = new WeakPropertyChangeListener(source, (PropertyChangeListener)listener, listenerType);
 		}
 		if (weakListener == null) {
-			throw new IllegalArgumentException("Unknown listener type '" + listenerType + "'.");
+			throw new IllegalArgumentException("Unknown listener type '" + listenerType.getName() + "'.");
 		}
 		return listenerType.cast(weakListener);
 	}
@@ -89,7 +89,7 @@ public final class WeakReferences {
 			}
 		}
 	}
-	
+
 	private static class WeakChangeListener extends AbstractWeakListener<ChangeListener, ChangeEvent> implements ChangeListener {
 		public WeakChangeListener(final Object source, final ChangeListener listener, final Class<?> listenerType) {
 			super(source, listener, listenerType);
@@ -103,7 +103,7 @@ public final class WeakReferences {
 			}
 		}
 	}
-	
+
 	private static class WeakComponentListener extends AbstractWeakListener<ComponentListener, ComponentEvent> implements ComponentListener {
 		public WeakComponentListener(final Object source, final ComponentListener listener, final Class<?> listenerType) {
 			super(source, listener, listenerType);
@@ -139,9 +139,9 @@ public final class WeakReferences {
 			if (listener != null) {
 				listener.componentHidden(event);
 			}
-		}	
+		}
 	}
-	
+
 	private static class WeakDocumentListener extends AbstractWeakListener<DocumentListener, DocumentEvent> implements DocumentListener {
 		public WeakDocumentListener(final Object source, final DocumentListener listener, final Class<?> listenerType) {
 			super(source, listener, listenerType);
@@ -171,7 +171,7 @@ public final class WeakReferences {
 			}
 		}
 	}
-	
+
 	private static class WeakFocusListener extends AbstractWeakListener<FocusListener, FocusEvent> implements FocusListener {
 		public WeakFocusListener(final Object source, final FocusListener listener, final Class<?> listenerType) {
 			super(source, listener, listenerType);
@@ -190,10 +190,10 @@ public final class WeakReferences {
 			FocusListener listener = get(event);
 			if (listener != null) {
 				listener.focusLost(event);
-			}	
+			}
 		}
 	}
-	
+
 	private static class WeakListSelectionListener extends AbstractWeakListener<ListSelectionListener, ListSelectionEvent> implements ListSelectionListener {
 		public WeakListSelectionListener(final Object source, final ListSelectionListener listener, final Class<?> listenerType) {
 			super(source, listener, listenerType);
@@ -207,12 +207,13 @@ public final class WeakReferences {
 			}
 		}
 	}
-	
+
 	private static class WeakPropertyChangeListener extends AbstractWeakListener<PropertyChangeListener, PropertyChangeEvent> implements PropertyChangeListener {
 		public WeakPropertyChangeListener(final Object source, final PropertyChangeListener listener, final Class<?> listenerType) {
 			super(source, listener, listenerType);
 		}
 
+		@Override
 		public void propertyChange(final PropertyChangeEvent event) {
 			PropertyChangeListener listener = get(event);
 			if (listener != null) {
@@ -224,16 +225,14 @@ public final class WeakReferences {
 		protected void removeListener(final PropertyChangeEvent event) {
 			super.removeListener(event);
 			try {
-				method("removePropertyChangeListener") //
-						.withParameterTypes(String.class, PropertyChangeListener.class) //
-						.in(event.getSource()) //
-						.invoke(event.getPropertyName(), this);
+				method("removePropertyChangeListener").withParameterTypes(String.class, PropertyChangeListener.class) //
+						.in(event.getSource()).invoke(event.getPropertyName(), this);
 			} catch (ReflectionError ignore) {
 				// ignore
 			}
 		}
 	}
-	
+
 	private static abstract class AbstractWeakListener<T, E> {
 		private final WeakReference<T> delegate;
 		private final Class<?> listenerType;
@@ -244,18 +243,15 @@ public final class WeakReferences {
 			delegate = new WeakReference<T>(listener);
 			this.listenerType = listenerType;
 		}
-		
+
 		protected void removeListener(final E event) {
 			try {
-				method("remove" + listenerType.getSimpleName()) //
-						.withParameterTypes(listenerType) //
-						.in(source) //
-						.invoke(this);
+				method("remove" + listenerType.getSimpleName()).withParameterTypes(listenerType).in(source).invoke(this);
 			} catch (ReflectionError ignore) {
 				// ignore
 			}
 		}
-		
+
 		protected T get(final E event) {
 			T listener = delegate.get();
 			if (listener == null) {

@@ -21,6 +21,7 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding.swing;
 
+import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
 import static de.fips.util.tinybinding.util.WeakReferences.weakListener;
 
 import java.awt.event.ActionEvent;
@@ -32,14 +33,13 @@ import java.lang.ref.WeakReference;
 import javax.swing.JComboBox;
 
 import de.fips.util.tinybinding.ObservableValue;
-import de.fips.util.tinybinding.util.Cast;
 
 /**
  * {@link ObservableValue} that can wrap the value selection of a {@link JComboBox}.
  * <p>
  * <b>Note:</b> All used listeners are added as a {@link WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
- * 
+ *
  * @see ActionListener
  * @see PropertyChangeListener
  * @param <T> Type of the observed combobox value.
@@ -54,22 +54,24 @@ class ObservableComboBoxValue<T> extends ObservableComponentValue<T, JComboBox> 
 		guardedUpdateValue();
 	}
 
+	@Override
 	public void actionPerformed(final ActionEvent event) {
 		guardedUpdateValue();
 	}
 
+	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
 		guardedUpdateValue();
 	}
 
 	@Override
-	protected void doSet(final T value) {
-		super.doSet(value);
+	protected void guardedDoSet(final T value) {
 		getComponent().setSelectedItem(value);
 	}
 
 	@Override
 	public T getComponentValue() {
-		return Cast.<T>uncheckedCast(getComponent().getSelectedItem());
+		final T value = uncheckedCast(getComponent().getSelectedItem());
+		return value;
 	}
 }

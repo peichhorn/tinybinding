@@ -22,6 +22,7 @@ THE SOFTWARE.
 package de.fips.util.tinybinding.swing;
 
 import static org.fest.reflect.core.Reflection.*;
+import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
 import static de.fips.util.tinybinding.util.Reflection.*;
 import static de.fips.util.tinybinding.util.WeakReferences.weakListener;
 
@@ -53,16 +54,14 @@ import de.fips.util.tinybinding.util.Cast;
 class ObservablePropertyValue<T> extends ObservableComponentValue<T, Container> implements PropertyChangeListener, ChangeListener {
 	private final String propertyName;
 	private final Class<T> propertyType;
-	
+
 	public ObservablePropertyValue(final String propertyName, final Class<T> propertyType, final Container component) {
 		super(component);
 		this.propertyName = propertyName;
 		this.propertyType = propertyType;
 		getComponent().addPropertyChangeListener(propertyName, weakListener(PropertyChangeListener.class, this, getComponent()));
 		try {
-			method("addChangeListener") //
-					.withParameterTypes(ChangeListener.class) //
-					.in(getComponent()) //
+			method("addChangeListener").withParameterTypes(ChangeListener.class).in(getComponent()) //
 					.invoke(weakListener(ChangeListener.class, this, getComponent()));
 		} catch (ReflectionError ignore) {
 			// ignore
@@ -75,43 +74,36 @@ class ObservablePropertyValue<T> extends ObservableComponentValue<T, Container> 
 		guardedUpdateValue();
 	}
 
+	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
 		guardedSetValue(Cast.<T>uncheckedCast(event.getNewValue()));
 	}
 
 	@Override
-	protected void doSet(final T value) throws VetoException {
-		super.doSet(value);
-		if (value != null) {
-			try {
-				getInvoker().set(value);
-			} catch (ReflectionError ignore) {
-				// ignore
-			}
+	protected void guardedDoSet(final T value) {
+		try {
+			if (value != null) getInvoker().set(value);
+		} catch (ReflectionError e) {
+			// ignore
 		}
 	}
 
 	@Override
 	public T getComponentValue() {
-		T value = null;
 		try {
-			value = getInvoker().get();
-		} catch (ReflectionError ignore) {
-			// ignore
+			return getInvoker().get();
+		} catch (ReflectionError e) {
+			return null;
 		}
-		return value;
 	}
-	
+
 	private Invoker<T> getInvoker() {
 		try {
-			return property(propertyName) //
-				.ofType(propertyType) //
-				.in(getComponent());
+			return property(propertyName).ofType(propertyType).in(getComponent());
 		} catch (ReflectionError e) {
 			if (hasPrimitive(propertyType)) {
-				return Cast.<Invoker<T>>uncheckedCast(property(propertyName) //
-					.ofType(getPrimitive(propertyType)) //
-					.in(getComponent()));
+				final Invoker<T> invoker = uncheckedCast(property(propertyName).ofType(getPrimitive(propertyType)).in(getComponent()));
+				return invoker;
 			} else throw e;
 		}
 	}

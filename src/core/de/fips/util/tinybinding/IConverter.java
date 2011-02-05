@@ -24,12 +24,12 @@ package de.fips.util.tinybinding;
 /**
  * Implementations of this interface a capable of transforming
  * objects of one type to objects of another type.
- * 
- * @param <S> Source type.
- * @param <T> Target type.
+ *
+ * @param <SOURCE_TYPE>
+ * @param <TARGET_TYPE>
  * @author Philipp Eichhorn
  */
-public interface IConverter<S, T> {
+public interface IConverter<SOURCE_TYPE, TARGET_TYPE> {
 
-	public T convert(S source);
+	public TARGET_TYPE convert(SOURCE_TYPE source);
 }

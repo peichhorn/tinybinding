@@ -22,10 +22,10 @@ THE SOFTWARE.
 package de.fips.util.tinybinding;
 
 /**
- * 
+ *
  * @author Philipp Eichhorn
  */
-public interface IValidator<T> {
+public interface IValidator<TYPE> {
 
-	public boolean validate(T value);
+	public boolean validate(TYPE value);
 }

@@ -22,10 +22,10 @@ THE SOFTWARE.
 package de.fips.util.tinybinding;
 
 /**
- * 
+ *
  * @author Philipp Eichhorn
  */
-public interface IValueObserver<T> {
+public interface IValueObserver<TYPE> {
 
-	public void valueChanged(T value, T oldValue);
+	public void valueChanged(TYPE value, TYPE oldValue);
 }

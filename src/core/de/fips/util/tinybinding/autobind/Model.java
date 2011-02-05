@@ -30,9 +30,9 @@ import java.lang.annotation.Target;
  * Indicates that the annotated object is a data model.
  * <p>
  * A data model can be bound to a form using the {@link AutoBinder}.
- * 
- * @See Form
- * @See AutoBinder
+ *
+ * @see Form
+ * @see AutoBinder#bind(Object, Object)
  * @author Philipp Eichhorn
  */
 @Target(ElementType.TYPE)

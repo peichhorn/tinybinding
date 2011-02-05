@@ -26,12 +26,12 @@ import java.util.List;
 /**
  * Implementations of this interface are capable of informing {@link IListObserver}
  * of data changes that occur.
- * 
+ *
  * @author Philipp Eichhorn
  */
-public interface IObservableList<T> extends List<T> {
+public interface IObservableList<ELEMENT_TYPE> extends List<ELEMENT_TYPE> {
 
-	public void addObserver(IListObserver<T> observer);
+	public void addObserver(IListObserver<ELEMENT_TYPE> observer);
 
-	public void removeObserver(IListObserver<T> observer);
+	public void removeObserver(IListObserver<ELEMENT_TYPE> observer);
 }

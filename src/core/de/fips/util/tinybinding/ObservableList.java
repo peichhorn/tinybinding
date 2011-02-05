@@ -32,7 +32,7 @@ import lombok.Delegate;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 
+ *
  * @author Philipp Eichhorn
  */
 @RequiredArgsConstructor
@@ -95,12 +95,14 @@ public class ObservableList<E> extends AbstractList<E> implements IObservableLis
 		}
 	}
 
+	@Override
 	public void addObserver(final IListObserver<E> observer) {
 		if (!registeredObservers.contains(observer)) {
 			registeredObservers.add(observer);
 		}
 	}
 
+	@Override
 	public void removeObserver(final IListObserver<E> observer) {
 		registeredObservers.remove(observer);
 	}

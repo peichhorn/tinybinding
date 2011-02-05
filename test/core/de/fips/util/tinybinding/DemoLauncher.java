@@ -42,7 +42,7 @@ public class DemoLauncher implements Application {
 	public static Class<?>[] getDemoClasses() {
 		return new Class<?>[] {SimpleDemo.class, SearchDemo.class};
 	}
-	
+
 	public ComboBoxModel getComboBoxModel() {
 		DefaultComboBoxModel model = new DefaultComboBoxModel();
 		for (Class<?> clazz : getDemoClasses()) {
@@ -50,7 +50,7 @@ public class DemoLauncher implements Application {
 		}
 		return model;
 	}
-	
+
 	@SwingInvokeLater
 	public void runApp(final String[] arg0) throws Throwable {
 		final JComboBox combobox = new JComboBox();
@@ -63,17 +63,17 @@ public class DemoLauncher implements Application {
 			getContentPane().add(new JButton(new LaunchAction(combobox)), BorderLayout.EAST),
 			pack(),
 			setVisible(true));
-		
+
 	}
-	
+
 	public static class LaunchAction extends AbstractAction {
 		private final JComboBox combobox;
-		
+
 		public LaunchAction(final JComboBox combobox) {
 			super("Launch");
 			this.combobox = combobox;
 		}
-		
+
 		@Override
 		public void actionPerformed(ActionEvent event) {
 			Class<?> clazz = getDemoClasses()[combobox.getSelectedIndex()];

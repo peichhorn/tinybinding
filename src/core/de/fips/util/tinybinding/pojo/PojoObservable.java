@@ -27,13 +27,13 @@ import de.fips.util.tinybinding.ObservableValue;
 
 /**
  * Creates {@link ObservableValue ObservableValues} for POJOs.
- * 
+ *
  * @author Philipp Eichhorn
  */
 @RequiredArgsConstructor
-public class PojoObservable {
+public final class PojoObservable {
 	private final Object pojo;
-	
+
 	public <T> IObservableValue<T> property(final String propertyName, final Class<T> propertyType) {
 		return new PojoObservableValue<T>(pojo, propertyName, propertyType);
 	}

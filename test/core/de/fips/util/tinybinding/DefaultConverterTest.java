@@ -29,12 +29,12 @@ import org.junit.rules.ExpectedException;
 
 /**
  * Tests the {@link DefaultConverter}.
- * 
+ *
  * @author Philipp Eichhorn
  */
 public class DefaultConverterTest {
 	@Rule public ExpectedException thrown = ExpectedException.none();
-	
+
 	@Test
 	public void test_convert() {
 		DefaultConverter<Integer, Number> converter = new DefaultConverter<Integer, Number>();

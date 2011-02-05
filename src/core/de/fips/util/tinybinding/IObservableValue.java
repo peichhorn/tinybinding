@@ -24,18 +24,18 @@ package de.fips.util.tinybinding;
 /**
  * Implementations of this interface are capable of informing {@link IValueObserver}
  * of data changes that occur.
- * 
+ *
  * @author Philipp Eichhorn
  */
-public interface IObservableValue<T> {
+public interface IObservableValue<TYPE> {
 
-	public T get();
+	public TYPE get();
 
-	public boolean set(final T value);
+	public boolean set(final TYPE value);
 
-	public void addObserver(final IValueObserver<T> observer);
+	public void addObserver(final IValueObserver<TYPE> observer);
 
-	public void addObserver(final IValueObserver<T> observer, final boolean emitValueChanged);
+	public void addObserver(final IValueObserver<TYPE> observer, final boolean emitValueChanged);
 
-	public void removeObserver(final IValueObserver<T> observer);
+	public void removeObserver(final IValueObserver<TYPE> observer);
 }

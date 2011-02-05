@@ -32,7 +32,7 @@ import org.junit.Test;
 
 /**
  * Tests the {@link DataBindingContext}.
- * 
+ *
  * @author Philipp Eichhorn
  */
 public class DataBindingContextTest {

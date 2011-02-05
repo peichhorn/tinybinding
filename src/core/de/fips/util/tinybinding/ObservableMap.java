@@ -36,7 +36,7 @@ import lombok.Delegate;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 
+ *
  * @author Philipp Eichhorn
  */
 @RequiredArgsConstructor
@@ -55,7 +55,7 @@ public class ObservableMap<K, V> extends AbstractMap<K, V> implements IObservabl
 		}
 	}
 
-	@Override 
+	@Override
 	public Set<Map.Entry<K, V>> entrySet() {
 		Set<Map.Entry<K, V>> es = entrySet;
 		return es != null ? es : (entrySet = new EntrySet());
@@ -96,12 +96,14 @@ public class ObservableMap<K, V> extends AbstractMap<K, V> implements IObservabl
 		return null;
 	}
 
+	@Override
 	public void addObserver(final IMapObserver<K, V> observer) {
 		if (!registeredObservers.contains(observer)) {
 			registeredObservers.add(observer);
 		}
 	}
 
+	@Override
 	public void removeObserver(final IMapObserver<K, V> observer) {
 		registeredObservers.remove(observer);
 	}
@@ -110,15 +112,18 @@ public class ObservableMap<K, V> extends AbstractMap<K, V> implements IObservabl
 		private final Iterator<Map.Entry<K, V>> iterator = map.entrySet().iterator();
 		private Map.Entry<K, V> last;
 
+		@Override
 		public boolean hasNext() {
 			return iterator.hasNext();
 		}
 
+		@Override
 		public Map.Entry<K, V> next() {
 			last = iterator.next();
 			return last;
 		}
 
+		@Override
 		public void remove() {
 			if (last == null) {
 				throw new IllegalStateException();

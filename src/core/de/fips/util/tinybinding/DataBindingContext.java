@@ -31,35 +31,36 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 /**
- * 
+ *
  * @author Philipp Eichhorn
  */
-public class DataBindingContext {
+public final class DataBindingContext {
 	private final Map<Pair<?, ?>, Binding<?, ?>> bindings = new HashMap<Pair<?, ?>, Binding<?, ?>>();
 
-	public <S, T> DataBindingContext bind(final IObservableValue<S> source, final IObservableValue<T> target) {
-		return bind(source, target, new UpdateStrategy<S, T>(), new UpdateStrategy<T, S>());
+	public final <SOURCE_TYPE, TARGET_TYPE> DataBindingContext bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target) {
+		return bind(source, target, new UpdateStrategy<SOURCE_TYPE, TARGET_TYPE>(), new UpdateStrategy<TARGET_TYPE, SOURCE_TYPE>());
 	}
-	
-	public <S, T> DataBindingContext bind(final IObservableValue<S> source, final IObservableValue<T> target, final IConverter<S, T> sourceToTarget) {
-		return bind(source, target, new UpdateStrategy<S, T>().converter(sourceToTarget), null);
+
+	public final <SOURCE_TYPE, TARGET_TYPE> DataBindingContext bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target,
+			final IConverter<SOURCE_TYPE, TARGET_TYPE> sourceToTarget) {
+		return bind(source, target, new UpdateStrategy<SOURCE_TYPE, TARGET_TYPE>().converter(sourceToTarget), null);
 	}
-	
-	public <S, T> DataBindingContext bind(final IObservableValue<S> source, final IObservableValue<T> target, final IConverter<S, T> sourceToTarget,
-			final IConverter<T, S> targetToSource) {
-		return bind(source, target, new UpdateStrategy<S, T>().converter(sourceToTarget), new UpdateStrategy<T, S>().converter(targetToSource));
+
+	public final <SOURCE_TYPE, TARGET_TYPE> DataBindingContext bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target,
+			final IConverter<SOURCE_TYPE, TARGET_TYPE> sourceToTarget, final IConverter<TARGET_TYPE, SOURCE_TYPE> targetToSource) {
+		return bind(source, target, new UpdateStrategy<SOURCE_TYPE, TARGET_TYPE>().converter(sourceToTarget), new UpdateStrategy<TARGET_TYPE, SOURCE_TYPE>().converter(targetToSource));
 	}
-	
-	public <S, T> DataBindingContext bind(final IObservableValue<S> source, final IObservableValue<T> target, final IUpdateStrategy<S, T> sourceToTarget,
-			final IUpdateStrategy<T, S> targetToSource) {
-		Binding<S, T> binder = new Binding<S, T>(source, target, sourceToTarget, targetToSource);
+
+	public final <SOURCE_TYPE, TARGET_TYPE> DataBindingContext bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target,
+			final IUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> sourceToTarget, final IUpdateStrategy<TARGET_TYPE, SOURCE_TYPE> targetToSource) {
+		Binding<SOURCE_TYPE, TARGET_TYPE> binder = new Binding<SOURCE_TYPE, TARGET_TYPE>(source, target, sourceToTarget, targetToSource);
 		bindings.put(Pair.of(source, target), binder);
 		binder.bind();
 		return this;
 	}
 
-	public <S, T> DataBindingContext unbind(final IObservableValue<S> source, final IObservableValue<T> target) {
-		Binding<S, T> binder = uncheckedCast(bindings.get(Pair.of(source, target)));
+	public final <SOURCE_TYPE, TARGET_TYPE> DataBindingContext unbind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target) {
+		Binding<SOURCE_TYPE, TARGET_TYPE> binder = uncheckedCast(bindings.get(Pair.of(source, target)));
 		if (binder != null) {
 			bindings.put(Pair.of(source, target), null);
 			binder.unbind();
@@ -67,7 +68,7 @@ public class DataBindingContext {
 		return this;
 	}
 
-	public DataBindingContext unbindAll() {
+	public final DataBindingContext unbindAll() {
 		for (Pair<?, ?> key : bindings.keySet()) {
 			Binding<?, ?> binder = bindings.get(key);
 			if (binder != null) {
@@ -78,18 +79,18 @@ public class DataBindingContext {
 		return this;
 	}
 
-	private static class Binding<S, T> {
-		private final IObservableValue<S> source;
-		private final IObservableValue<T> target;
-		private final ValueObserver<S, T> sourceObserver;
-		private final ValueObserver<T, S> targetObserver;
+	private static class Binding<SOURCE_TYPE, TARGET_TYPE> {
+		private final IObservableValue<SOURCE_TYPE> source;
+		private final IObservableValue<TARGET_TYPE> target;
+		private final ValueObserver<SOURCE_TYPE, TARGET_TYPE> sourceObserver;
+		private final ValueObserver<TARGET_TYPE, SOURCE_TYPE> targetObserver;
 
-		public Binding(final IObservableValue<S> source, final IObservableValue<T> target, final IUpdateStrategy<S, T> sourceToTarget,
-				final IUpdateStrategy<T, S> targetToSource) {
+		public Binding(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target, final IUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> sourceToTarget,
+				final IUpdateStrategy<TARGET_TYPE, SOURCE_TYPE> targetToSource) {
 			this.source = source;
 			this.target = target;
-			sourceObserver = new ValueObserver<S, T>(source, target, sourceToTarget);
-			targetObserver = new ValueObserver<T, S>(target, source, targetToSource);
+			sourceObserver = new ValueObserver<SOURCE_TYPE, TARGET_TYPE>(source, target, sourceToTarget);
+			targetObserver = new ValueObserver<TARGET_TYPE, SOURCE_TYPE>(target, source, targetToSource);
 			sourceObserver.setTargetObserver(targetObserver);
 			targetObserver.setTargetObserver(sourceObserver);
 		}
@@ -113,6 +114,7 @@ public class DataBindingContext {
 		@Setter
 		private IValueObserver<T> targetObserver;
 
+		@Override
 		public void valueChanged(final S value, final S oldValue) {
 			target.removeObserver(targetObserver);
 			S s = source.get();
@@ -131,7 +133,7 @@ public class DataBindingContext {
 	private static class Pair<A, B> {
 		private final A first;
 		private final B second;
-		
+
 		public static <A, B> Pair<A, B> of(final A first, final B second) {
 			return new Pair<A, B>(first, second);
 		}

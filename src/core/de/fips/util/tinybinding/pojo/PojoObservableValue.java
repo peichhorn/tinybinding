@@ -23,6 +23,7 @@ package de.fips.util.tinybinding.pojo;
 
 import static org.fest.reflect.core.Reflection.method;
 import static org.fest.reflect.core.Reflection.property;
+import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
 import static de.fips.util.tinybinding.util.Reflection.getPrimitive;
 import static de.fips.util.tinybinding.util.Reflection.hasPrimitive;
 import static de.fips.util.tinybinding.util.WeakReferences.weakListener;
@@ -35,7 +36,6 @@ import org.fest.reflect.beanproperty.Invoker;
 import org.fest.reflect.exception.ReflectionError;
 
 import de.fips.util.tinybinding.ObservableValue;
-import de.fips.util.tinybinding.util.Cast;
 import de.fips.util.tinybinding.util.WeakReferences;
 
 /**
@@ -48,7 +48,7 @@ import de.fips.util.tinybinding.util.WeakReferences;
  * <p>
  * <b>Note:</b> The {@link PropertyChangeListener} is added as a {@link WeakReference}, so it gets
  * garbage collected when the time comes.
- * 
+ *
  * @param <T> Type of the observed POJO field
  * @see WeakReferences
  * @author Philipp Eichhorn
@@ -58,65 +58,58 @@ class PojoObservableValue<T> extends ObservableValue<T> implements PropertyChang
 	private final String propertyName;
 	private final Class<T> propertyType;
 	private volatile boolean propertyChange;
-	
-	public PojoObservableValue(final Object pojo, final String propertyName, final Class<T> propertyType) {
+
+	PojoObservableValue(final Object pojo, final String propertyName, final Class<T> propertyType) {
 		this.pojo = pojo;
 		this.propertyName = propertyName;
 		this.propertyType = propertyType;
 		try {
-			method("addPropertyChangeListener") //
-				.withParameterTypes(String.class, PropertyChangeListener.class) //
-				.in(pojo) //
+			method("addPropertyChangeListener").withParameterTypes(String.class, PropertyChangeListener.class).in(pojo) //
 				.invoke(propertyName, weakListener(PropertyChangeListener.class, this, pojo));
 		} catch (ReflectionError ignore) {
 			// ignore
 		}
 		guardedSetValue(getPojoValue());
 	}
-	
+
+	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
-		guardedSetValue(Cast.<T>uncheckedCast(event.getNewValue()));
+		final T newValue = uncheckedCast(event.getNewValue());
+		guardedSetValue(newValue);
 	}
-	
+
 	protected void guardedSetValue(final T value) {
 		propertyChange = true;
 		set(value);
 		propertyChange = false;
 	}
-	
+
 	protected T getPojoValue() {
-		T value = null;
 		try {
-			value = getInvoker().get();
+			return getInvoker().get();
 		} catch (ReflectionError ignore) {
-			// ignore
+			return null;
 		}
-		return value;
 	}
-	
+
 	@Override
-	protected void doSet(final T value) throws VetoException {
-		super.doSet(value);
-		if (propertyChange) {
-			throw new VetoException();
-		}	
-		try {
-			getInvoker().set(value);
-		} catch (ReflectionError ignore) {
-			// ignore
+	protected void doSet(final T value) {
+		if (!propertyChange) {
+			try {
+				getInvoker().set(value);
+			} catch (ReflectionError ignore) {
+				// ignore
+			}
 		}
 	}
-	
+
 	private Invoker<T> getInvoker() {
 		try {
-			return property(propertyName) //
-				.ofType(propertyType) //
-				.in(pojo);
+			return property(propertyName).ofType(propertyType).in(pojo);
 		} catch (ReflectionError e) {
 			if (hasPrimitive(propertyType)) {
-				return Cast.<Invoker<T>>uncheckedCast(property(propertyName) //
-					.ofType(getPrimitive(propertyType)) //
-					.in(pojo));
+				final Invoker<T> invoker = uncheckedCast(property(propertyName).ofType(getPrimitive(propertyType)).in(pojo));
+				return invoker;
 			} else throw e;
 		}
 	}

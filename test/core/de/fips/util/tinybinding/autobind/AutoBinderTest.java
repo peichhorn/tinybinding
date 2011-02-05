@@ -45,12 +45,12 @@ import de.fips.util.tinybinding.autobind.Model;
 
 /**
  * Tests the {@link AutoBinder}.
- * 
+ *
  * @author Philipp Eichhorn
  */
 public class AutoBinderTest {
 	@Rule public ExpectedException thrown = ExpectedException.none();
-	
+
 	private TestModel model;
 	private TestModel2 model2;
 	private TestForm form;
@@ -109,25 +109,29 @@ public class AutoBinderTest {
 
 	@Test
 	public void test_bind_nullValues1() throws NoSuchFieldException {
-		thrown.expect(NullPointerException.class);
+		thrown.expect(IllegalArgumentException.class);
+		thrown.expectMessage("'modelObject' may not be null.");
 		context = AutoBinder.bind(null, form2);
 	}
 
 	@Test
 	public void test_bind_nullValues2() throws NoSuchFieldException {
-		thrown.expect(NullPointerException.class);
+		thrown.expect(IllegalArgumentException.class);
+		thrown.expectMessage("'formObject' may not be null.");
 		context = AutoBinder.bind(model, null);
 	}
 
 	@Test
 	public void test_bind_missingAnnotation1() throws NoSuchFieldException {
 		thrown.expect(IllegalArgumentException.class);
+		thrown.expectMessage("'java.lang.String' needs to be annotated with '@de.fips.util.tinybinding.autobind.Model'.");
 		context = AutoBinder.bind("", form2);
 	}
 
 	@Test
 	public void test_bind_missingAnnotation2() throws NoSuchFieldException {
 		thrown.expect(IllegalArgumentException.class);
+		thrown.expectMessage("'java.lang.String' needs to be annotated with '@de.fips.util.tinybinding.autobind.Form'.");
 		context = AutoBinder.bind(model, "");
 	}
 

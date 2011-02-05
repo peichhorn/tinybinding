@@ -38,13 +38,13 @@ import lombok.AutoGenMethodStub;
  * <p>
  * <b>Note:</b> All used listeners are added as a {@link WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
- * 
+ *
  * @see ComponentListener
  * @author Philipp Eichhorn
  */
 @AutoGenMethodStub
 class ObservableBoundsValue extends ObservableComponentValue<Rectangle, Container> implements ComponentListener {
-	
+
 	public ObservableBoundsValue(final Container component) {
 		super(component);
 		getComponent().addComponentListener(weakListener(ComponentListener.class, this, getComponent()));
@@ -61,11 +61,8 @@ class ObservableBoundsValue extends ObservableComponentValue<Rectangle, Containe
 	}
 
 	@Override
-	protected void doSet(final Rectangle value) {
-		super.doSet(value);
-		if (value != null) {
-			getComponent().setBounds(value);
-		}
+	protected void guardedDoSet(final Rectangle value) {
+		if (value != null) getComponent().setBounds(value);
 	}
 
 	@Override

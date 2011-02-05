@@ -11,10 +11,10 @@
     <dependency org="junit.org" name="junit" rev="4.8.2" conf="test; contrib->sources" />
     <dependency org="org.mockito" name="mockito-all" rev="1.8.5" conf="test; contrib->sources" />
     <dependency org="easytesting.org" name="fest-assert" rev="1.3" conf="test; contrib->sources" />
-	<dependency org="abbot" name="abbot" rev="1.0.2" conf="test" />
+    <dependency org="abbot" name="abbot" rev="1.0.2" conf="test" />
 
     <dependency org="de.fips" name="lombok-pg" rev="0.10.0-BETA2-HEAD" conf="build" />
-	<dependency org="easytesting.org" name="fest-util" rev="1.1.4" conf="build" />
-	<dependency org="easytesting.org" name="fest-reflect" rev="1.2" conf="build" />
+    <dependency org="easytesting.org" name="fest-util" rev="1.1.4" conf="build" />
+    <dependency org="easytesting.org" name="fest-reflect" rev="1.2" conf="build" />
   </dependencies>
 </ivy-module>

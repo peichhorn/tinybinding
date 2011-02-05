@@ -37,7 +37,7 @@ import lombok.AutoGenMethodStub;
  * <p>
  * <b>Note:</b> All used listeners are added as a {@link WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
- * 
+ *
  * @see ComponentListener
  * @author Philipp Eichhorn
  */
@@ -61,11 +61,8 @@ class ObservableVisibleValue extends ObservableComponentValue<Boolean, Container
 	}
 
 	@Override
-	protected void doSet(final Boolean value) throws VetoException {
-		super.doSet(value);
-		if (value != null) {
-			getComponent().setVisible(value.booleanValue());
-		}
+	protected void guardedDoSet(final Boolean value) {
+		if (value != null) getComponent().setVisible(value.booleanValue());
 	}
 
 	@Override

@@ -21,26 +21,27 @@ THE SOFTWARE.
  */
 package de.fips.util.tinybinding;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 /**
  * This class holds current version.
- * 
+ *
  * @author Philipp Eichhorn
  */
+@NoArgsConstructor(access=AccessLevel.PRIVATE)
 public final class Version {
 	private static final String VERSION = "1.0.2-HEAD";
-	
-	private Version() {
-	}
-	
+
 	/** Prints the version followed by a newline, and exits. */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		if (args.length > 0) {
 			System.out.printf("tinybinding %s", getVersion());
 		} else {
 			System.out.println(VERSION);
 		}
 	}
-	
+
 	/** Get the current version. */
 	public static String getVersion() {
 		return VERSION;

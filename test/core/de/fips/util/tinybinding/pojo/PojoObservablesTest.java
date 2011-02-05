@@ -42,13 +42,13 @@ import de.fips.util.tinybinding.IValueObserver;
 
 /**
  * Tests the {@link PojoObservables}.
- * 
+ *
  * @author Philipp Eichhorn
  */
 public class PojoObservablesTest {
 	private TestPojo1 pojo1;
 	private TestPojo2 pojo2;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		pojo1 = new TestPojo1();
@@ -64,7 +64,7 @@ public class PojoObservablesTest {
 		text.set("42");
 		assertThat(pojo1.getText()).isEqualTo("42");
 	}
-	
+
 	@Test
 	public void test_observeValue_setter_withoutPropertyChangeSupport() {
 		IObservableValue<String> text = observe(pojo1).property("text", String.class);
@@ -73,7 +73,7 @@ public class PojoObservablesTest {
 		pojo1.setText("42");
 		verify(observer, times(0)).valueChanged(eq("42"), any(String.class));
 	}
-	
+
 	@Test
 	public void test_observeValue_setter_withPropertyChangeSupport() {
 		IObservableValue<String> text = observe(pojo2).property("text", String.class);
@@ -87,7 +87,7 @@ public class PojoObservablesTest {
 	public static class TestPojo1 {
 		private String text;
 	}
-	
+
 	@NoArgsConstructor
 	public static class TestPojo2 {
 		@Getter

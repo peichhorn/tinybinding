@@ -35,7 +35,7 @@ import de.fips.util.tinybinding.ObservableValue;
  * <p>
  * <b>Note:</b> All used listeners are added as a {@link WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
- * 
+ *
  * @see FocusListener
  * @author Philipp Eichhorn
  */
@@ -57,11 +57,8 @@ class ObservableFocusValue extends ObservableComponentValue<Boolean, Container> 
 	}
 
 	@Override
-	protected void doSet(final Boolean value) {
-		super.doSet(value);
-		if ((value != null) && value.booleanValue()) {
-			getComponent().requestFocusInWindow();
-		}
+	protected void guardedDoSet(final Boolean value) {
+		if ((value != null) && value.booleanValue()) getComponent().requestFocusInWindow();
 	}
 
 	@Override

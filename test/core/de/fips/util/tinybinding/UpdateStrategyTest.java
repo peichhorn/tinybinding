@@ -31,7 +31,7 @@ import org.junit.Test;
 
 /**
  * Tests the {@link UpdateStrategy}.
- * 
+ *
  * @author Philipp Eichhorn
  */
 public class UpdateStrategyTest {

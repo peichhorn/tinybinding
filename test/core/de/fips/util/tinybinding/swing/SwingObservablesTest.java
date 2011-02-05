@@ -52,7 +52,7 @@ import de.fips.util.tinybinding.IValueObserver;
 
 /**
  * Tests the {@link SwingObservables}
- * 
+ *
  * @author Philipp Eichhorn
  */
 public class SwingObservablesTest extends ComponentTestFixture {

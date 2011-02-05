@@ -28,7 +28,9 @@ import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,14 +62,14 @@ public class SearchDemo implements Application {
 			pack(),
 			setVisible(true));
 	}
-	
+
 	public static class SearchDemoView extends JPanel {
 		private static final long serialVersionUID = 2769688665317243418L;
 
 		final IObservableValue<String> searchText;
 		final IObservableValue<String> comboValue;
 		final IObservableValue<Boolean> enabledValue;
-		
+
 		public SearchDemoView(final Action action, final ComboBoxModel model) {
 			setLayout(new BorderLayout());
 			JTextField textField = new JTextField();
@@ -78,13 +80,13 @@ public class SearchDemo implements Application {
 			add(textField, BorderLayout.WEST);
 			add(comboBox, BorderLayout.CENTER);
 			add(searchButton, BorderLayout.EAST);
-			
+
 			searchText = observe(textField).text();
 			comboValue = observe(comboBox).value();
 			enabledValue = observe(searchButton).enabled();
 		}
 	}
-	
+
 	public static class SearchDemoViewLogic {
 		private final DefaultComboBoxModel model;
 		private final SearchAction action;
@@ -99,7 +101,7 @@ public class SearchDemo implements Application {
 
 		public JPanel createView() {
 			SearchDemoView view = new SearchDemoView(action, model);
-			
+
 			AggregatedBoolean aggregatedValue = new AggregatedBoolean();
 			DataBindingContext context = new DataBindingContext();
 			context.bind(view.searchText, aggregatedValue.add(), StringLengthToBooleanConverter.notEmpty());
@@ -109,30 +111,32 @@ public class SearchDemo implements Application {
 			return view;
 		}
 	}
-	
+
 	public static class SearchAction extends AbstractAction {
 		private static final long serialVersionUID = -8331751772675716791L;
 
 		@Getter
 		private final IObservableValue<String> searchText = ObservableValue.of("");
-		
+
 		public SearchAction() {
 			super("Search");
 		}
-		
+
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			if (Desktop.isDesktopSupported()) {
 				final Desktop desktop = Desktop.getDesktop();
 				try {
 					desktop.browse(new URI("http://www.google.com/search?q=" + searchText.get().replaceAll(" ", "%20")));
-				} catch (final Exception ignore) {
+				} catch (final URISyntaxException ignore) {
+					// ignore
+				} catch (final IOException ignore) {
 					// ignore
 				}
 			}
 		}
 	}
-	
+
 	@RequiredArgsConstructor(access=AccessLevel.PRIVATE)
 	public static class StringLengthToBooleanConverter implements IConverter<String, Boolean> {
 		private final int minimalLength;
@@ -145,12 +149,12 @@ public class SearchDemo implements Application {
 		public static IConverter<String, Boolean> notEmpty() {
 			return new StringLengthToBooleanConverter(1);
 		}
-		
+
 		public static StringLengthToBooleanConverter atLeast(final int minimalLength) {
 			return new StringLengthToBooleanConverter(minimalLength);
 		}
 	}
-	
+
 	@RequiredArgsConstructor(access=AccessLevel.PRIVATE)
 	public static class ValueToBooleanConverter<T> implements IConverter<T, Boolean> {
 		private final T trueValue;
@@ -158,28 +162,27 @@ public class SearchDemo implements Application {
 		public Boolean convert(final T source) {
 			return trueValue.equals(source);
 		}
-		
+
 		public static <T> ValueToBooleanConverter<T> isTrue(final T trueValue) {
 			return new ValueToBooleanConverter<T>(trueValue);
 		}
 	}
-	
+
 	@NoArgsConstructor
 	public static class AggregatedBoolean extends ObservableValue<Boolean> {
-		private final List<IObservableValue<Boolean>> values = new ArrayList<IObservableValue<Boolean>>(); 
-		
+		private final List<IObservableValue<Boolean>> values = new ArrayList<IObservableValue<Boolean>>();
+
 		public IObservableValue<Boolean> add() {
 			IObservableValue<Boolean> value = new ObservableValue<Boolean>() {
 				@Override
 				protected void doSet(final Boolean value) {
-					super.doSet(value);
 					update();
 				}
 			};
 			values.add(value);
 			return value;
 		}
-		
+
 		private void update() {
 			boolean b = true;
 			for (IObservableValue<Boolean> value : values) {

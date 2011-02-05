@@ -21,6 +21,7 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding.swing;
 
+import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
 import static de.fips.util.tinybinding.util.WeakReferences.weakListener;
 
 import java.lang.ref.WeakReference;
@@ -30,14 +31,13 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import de.fips.util.tinybinding.ObservableValue;
-import de.fips.util.tinybinding.util.Cast;
 
 /**
  * {@link ObservableValue} that can wrap the item selection of a {@link JList}.
  * <p>
  * <b>Note:</b> All used listeners are added as a {@link WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
- * 
+ *
  * @param <T> Type of the observed list value.
  * @see ListSelectionListener
  * @author Philipp Eichhorn
@@ -56,13 +56,13 @@ class ObservableListValue<T> extends ObservableComponentValue<T, JList> implemen
 	}
 
 	@Override
-	protected void doSet(final T value) {
-		super.doSet(value);
+	protected void guardedDoSet(final T value) {
 		getComponent().setSelectedValue(value, true);
 	}
 
 	@Override
 	public T getComponentValue() {
-		return Cast.<T>uncheckedCast(getComponent().getSelectedValue());
+		final T value = uncheckedCast(getComponent().getSelectedValue());
+		return value;
 	}
 }

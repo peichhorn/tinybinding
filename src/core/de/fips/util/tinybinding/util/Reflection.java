@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Collection of useful reflection methods.
- * 
+ *
  * @author Philipp Eichhorn
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

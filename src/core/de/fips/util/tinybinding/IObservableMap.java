@@ -26,12 +26,12 @@ import java.util.Map;
 /**
  * Implementations of this interface are capable of informing {@link IMapObserver}
  * of data changes that occur.
- * 
+ *
  * @author Philipp Eichhorn
  */
-public interface IObservableMap<K, V> extends Map<K, V> {
+public interface IObservableMap<KEY_TYPE, VALUE_TYPE> extends Map<KEY_TYPE, VALUE_TYPE> {
 
-	public void addObserver(IMapObserver<K, V> observer);
+	public void addObserver(IMapObserver<KEY_TYPE, VALUE_TYPE> observer);
 
-	public void removeObserver(IMapObserver<K, V> observer);
+	public void removeObserver(IMapObserver<KEY_TYPE, VALUE_TYPE> observer);
 }

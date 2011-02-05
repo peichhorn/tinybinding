@@ -25,13 +25,13 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
- * 
+ *
  * @author Philipp Eichhorn
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Cast {
 	@SuppressWarnings("unchecked")
-	public static <T> T uncheckedCast(Object value) {
+	public static <T> T uncheckedCast(final Object value) {
 		return (T)value;
 	}
 }

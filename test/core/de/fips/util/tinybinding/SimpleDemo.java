@@ -64,15 +64,15 @@ public class SimpleDemo implements Application {
 			setResizable(false),
 			setVisible(true));
 	}
-	
+
 	public static class LoginAction extends AbstractAction {
 		private final LoginModel model;
-		
+
 		public LoginAction(final LoginModel model) {
 			super("Login");
 			this.model = model;
 		}
-		
+
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 			if ("user".equals(model.loginName.get()) && "1234".equals(model.password.get())) {
@@ -86,7 +86,7 @@ public class SimpleDemo implements Application {
 			}
 		}
 	}
-	
+
 	@Form
 	public static class LoginForm extends JPanel {
 		private static final long serialVersionUID = 7239761542065605502L;
@@ -105,7 +105,7 @@ public class SimpleDemo implements Application {
 			add(autologin);
 		}
 	}
-	
+
 	@Model
 	public static class LoginModel {
 		public IObservableValue<String> loginName = ObservableValue.of("");

@@ -29,6 +29,7 @@ import java.lang.ref.WeakReference;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
@@ -39,7 +40,7 @@ import de.fips.util.tinybinding.ObservableValue;
  * <p>
  * <b>Note:</b> All used listeners are added as a {@link WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
- * 
+ *
  * @see DocumentListener
  * @see PropertyChangeListener
  * @author Philipp Eichhorn
@@ -57,18 +58,22 @@ class ObservableDocumentValue extends ObservableComponentValue<String, JTextComp
 		guardedUpdateValue();
 	}
 
+	@Override
 	public void changedUpdate(final DocumentEvent event) {
 		guardedUpdateValue();
 	}
 
+	@Override
 	public void insertUpdate(final DocumentEvent event) {
 		guardedUpdateValue();
 	}
 
+	@Override
 	public void removeUpdate(final DocumentEvent event) {
 		guardedUpdateValue();
 	}
 
+	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
 		document.removeDocumentListener(weakDocumentListener);
 		document = (Document) event.getNewValue();
@@ -78,24 +83,21 @@ class ObservableDocumentValue extends ObservableComponentValue<String, JTextComp
 	}
 
 	@Override
-	protected void doSet(final String value) {
-		super.doSet(value);
+	protected void guardedDoSet(final String value) {
 		try {
 			document.remove(0, document.getLength());
 			document.insertString(0, value, null);
-		} catch (Exception ignore) {
+		} catch (BadLocationException e) {
 			// ignore
 		}
 	}
 
 	@Override
 	public String getComponentValue() {
-		String value = null;
 		try {
-			value = document.getText(0, document.getLength());
-		} catch (Exception ignore) {
-			// ignore
+			return document.getText(0, document.getLength());
+		} catch (BadLocationException e) {
+			return null;
 		}
-		return value;
 	}
 }

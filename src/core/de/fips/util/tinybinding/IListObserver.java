@@ -26,14 +26,14 @@ import java.util.List;
 /**
  * Implementations of this interface are capable of receiving data changes
  * of a {@link java.util.List List} data-structure.
- * 
+ *
  * @author Philipp Eichhorn
  */
-public interface IListObserver<T> {
+public interface IListObserver<ELEMENT_TYPE> {
 
-	public void valuesAdded(IObservableList<T> list, int index, int length);
+	public void valuesAdded(IObservableList<ELEMENT_TYPE> list, int index, int length);
 
-	public void valuesRemoved(IObservableList<T> list, int index, List<T> oldElements);
+	public void valuesRemoved(IObservableList<ELEMENT_TYPE> list, int index, List<ELEMENT_TYPE> oldElements);
 
-	public void valueReplaced(IObservableList<T> list, int index, T oldElement);
+	public void valueReplaced(IObservableList<ELEMENT_TYPE> list, int index, ELEMENT_TYPE oldElement);
 }

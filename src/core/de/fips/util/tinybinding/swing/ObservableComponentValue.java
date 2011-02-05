@@ -26,11 +26,12 @@ import java.lang.ref.WeakReference;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import de.fips.util.tinybinding.ObservableValue;
 
 /**
- * Abstract class that offers its subclasses the basic functionality 
+ * Abstract class that offers its subclasses the basic functionality
  * to synchronize themselves with Swing Component values or states.
  * <p>
  * <b>Note:</b> All used listeners are added as a {@link WeakReference WeakReferences}, so they gets
@@ -42,9 +43,14 @@ import de.fips.util.tinybinding.ObservableValue;
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 abstract class ObservableComponentValue<T, C extends Container> extends ObservableValue<T> {
+	@NonNull
 	@Getter(AccessLevel.PROTECTED)
 	private final C component;
 	private volatile boolean propertyChange;
+
+	protected final void guardedUpdateValue() {
+		guardedSetValue(getComponentValue());
+	}
 
 	protected final void guardedSetValue(final T value) {
 		propertyChange = true;
@@ -52,17 +58,15 @@ abstract class ObservableComponentValue<T, C extends Container> extends Observab
 		propertyChange = false;
 	}
 
-	protected void guardedUpdateValue() {
-		guardedSetValue(getComponentValue());
-	}
 
 	protected abstract T getComponentValue();
 
 	@Override
-	protected void doSet(final T value) throws VetoException {
-		super.doSet(value);
-		if (propertyChange) {
-			throw new VetoException();
+	protected final void doSet(final T value){
+		if (!propertyChange) {
+			guardedDoSet(value);
 		}
 	}
+
+	protected abstract void guardedDoSet(final T value);
 }

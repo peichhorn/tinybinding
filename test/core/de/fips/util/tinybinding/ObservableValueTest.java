@@ -29,7 +29,7 @@ import org.junit.Test;
 
 /**
  * Tests the {@link ObservableValue}.
- * 
+ *
  * @author Philipp Eichhorn
  */
 public class ObservableValueTest {

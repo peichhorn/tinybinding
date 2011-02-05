@@ -35,7 +35,7 @@ import de.fips.util.tinybinding.util.WeakReferences;
 
 /**
  * Tests the {@link WeakReferences}.
- * 
+ *
  * @author Philipp Eichhorn
  */
 public class WeakReferencesTest {

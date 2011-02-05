@@ -21,15 +21,17 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding;
 
-import de.fips.util.tinybinding.util.Cast;
+import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
 
 /**
- * 
+ *
  * @author Philipp Eichhorn
  */
-public class DefaultConverter<S, T> implements IConverter<S, T> {
+public final class DefaultConverter<SOURCE_TYPE, TARGET_TYPE> implements IConverter<SOURCE_TYPE, TARGET_TYPE> {
 
-	public T convert(final S source) {
-		return Cast.<T>uncheckedCast(source);
+	@Override
+	public final TARGET_TYPE convert(final SOURCE_TYPE source) {
+		final TARGET_TYPE target = uncheckedCast(source);
+		return target;
 	}
 }

@@ -29,7 +29,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
- * 
+ *
  * @author Philipp Eichhorn
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -37,7 +37,7 @@ public final class Observables {
 	public static SwingObservable observe(final Container source) {
 		return new SwingObservable(source);
 	}
-	
+
 	public static PojoObservable observe(final Object pojo) {
 		return new PojoObservable(pojo);
 	}
