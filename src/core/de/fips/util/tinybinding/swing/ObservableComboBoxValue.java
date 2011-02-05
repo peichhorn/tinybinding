@@ -21,7 +21,6 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding.swing;
 
-import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
 import static de.fips.util.tinybinding.util.WeakReferences.weakListener;
 
 import java.awt.event.ActionEvent;
@@ -33,6 +32,7 @@ import java.lang.ref.WeakReference;
 import javax.swing.JComboBox;
 
 import de.fips.util.tinybinding.ObservableValue;
+import de.fips.util.tinybinding.util.Cast;
 
 /**
  * {@link ObservableValue} that can wrap the value selection of a {@link JComboBox}.
@@ -71,7 +71,6 @@ class ObservableComboBoxValue<T> extends ObservableComponentValue<T, JComboBox> 
 
 	@Override
 	public T getComponentValue() {
-		final T value = uncheckedCast(getComponent().getSelectedItem());
-		return value;
+		return Cast.<T>uncheckedCast(getComponent().getSelectedItem());
 	}
 }

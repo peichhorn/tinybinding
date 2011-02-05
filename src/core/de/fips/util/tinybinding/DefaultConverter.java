@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding;
 
-import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
+import de.fips.util.tinybinding.util.Cast;
 
 /**
  *
@@ -31,7 +31,6 @@ public final class DefaultConverter<SOURCE_TYPE, TARGET_TYPE> implements IConver
 
 	@Override
 	public final TARGET_TYPE convert(final SOURCE_TYPE source) {
-		final TARGET_TYPE target = uncheckedCast(source);
-		return target;
+		return Cast.<TARGET_TYPE>uncheckedCast(source);
 	}
 }

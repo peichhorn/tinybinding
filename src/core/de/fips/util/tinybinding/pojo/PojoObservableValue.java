@@ -36,6 +36,7 @@ import org.fest.reflect.beanproperty.Invoker;
 import org.fest.reflect.exception.ReflectionError;
 
 import de.fips.util.tinybinding.ObservableValue;
+import de.fips.util.tinybinding.util.Cast;
 import de.fips.util.tinybinding.util.WeakReferences;
 
 /**
@@ -74,8 +75,7 @@ class PojoObservableValue<T> extends ObservableValue<T> implements PropertyChang
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
-		final T newValue = uncheckedCast(event.getNewValue());
-		guardedSetValue(newValue);
+		guardedSetValue(Cast.<T>uncheckedCast(event.getNewValue()));
 	}
 
 	protected void guardedSetValue(final T value) {
