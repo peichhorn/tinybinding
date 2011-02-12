@@ -34,9 +34,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import de.fips.util.tinybinding.DataBindingContext;
+import de.fips.util.tinybinding.ExpectedException;
 import de.fips.util.tinybinding.IObservableValue;
 import de.fips.util.tinybinding.ObservableValue;
 import de.fips.util.tinybinding.autobind.AutoBinder;
@@ -49,7 +49,8 @@ import de.fips.util.tinybinding.autobind.Model;
  * @author Philipp Eichhorn
  */
 public class AutoBinderTest {
-	@Rule public ExpectedException thrown = ExpectedException.none();
+	@Rule
+	public final ExpectedException thrown = ExpectedException.none();
 
 	private TestModel model;
 	private TestModel2 model2;
@@ -109,29 +110,25 @@ public class AutoBinderTest {
 
 	@Test
 	public void test_bind_nullValues1() throws NoSuchFieldException {
-		thrown.expect(IllegalArgumentException.class);
-		thrown.expectMessage("'modelObject' may not be null.");
+		thrown.expectIllegalArgumentException("'modelObject' may not be null.");
 		context = AutoBinder.bind(null, form2);
 	}
 
 	@Test
 	public void test_bind_nullValues2() throws NoSuchFieldException {
-		thrown.expect(IllegalArgumentException.class);
-		thrown.expectMessage("'formObject' may not be null.");
+		thrown.expectIllegalArgumentException("'formObject' may not be null.");
 		context = AutoBinder.bind(model, null);
 	}
 
 	@Test
 	public void test_bind_missingAnnotation1() throws NoSuchFieldException {
-		thrown.expect(IllegalArgumentException.class);
-		thrown.expectMessage("'java.lang.String' needs to be annotated with '@de.fips.util.tinybinding.autobind.Model'.");
+		thrown.expectIllegalArgumentException("'java.lang.String' needs to be annotated with '@de.fips.util.tinybinding.autobind.Model'.");
 		context = AutoBinder.bind("", form2);
 	}
 
 	@Test
 	public void test_bind_missingAnnotation2() throws NoSuchFieldException {
-		thrown.expect(IllegalArgumentException.class);
-		thrown.expectMessage("'java.lang.String' needs to be annotated with '@de.fips.util.tinybinding.autobind.Form'.");
+		thrown.expectIllegalArgumentException("'java.lang.String' needs to be annotated with '@de.fips.util.tinybinding.autobind.Form'.");
 		context = AutoBinder.bind(model, "");
 	}
 

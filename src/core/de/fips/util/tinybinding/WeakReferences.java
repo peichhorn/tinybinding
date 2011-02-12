@@ -21,35 +21,19 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-
-import org.junit.Test;
-
-import de.fips.util.tinybinding.util.WeakReferences;
+import de.fips.util.tinybinding.weaklistener.WeakListenerWithType;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
- * Tests the {@link WeakReferences}.
+ * Creates all kinds of useful {@link WeakReference WeakReferences}.
  *
  * @author Philipp Eichhorn
  */
-public class WeakReferencesTest {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class WeakReferences {
 
-	@Test
-	public void test_weakListener() {
-		ActionListener listener = mock(ActionListener.class);
-		JButton button = mock(JButton.class);
-		ActionListener weakListener = WeakReferences.weakListener(ActionListener.class, listener, button);
-		weakListener.actionPerformed(mock(ActionEvent.class));
-		verify(listener, times(1)).actionPerformed(any(ActionEvent.class));
-		listener = null;
-		System.gc();
-		weakListener.actionPerformed(mock(ActionEvent.class));
-		verify(button, times(1)).removeActionListener(eq(weakListener));
+	public static <S, T extends S> WeakListenerWithType<S, T> weakListener(final Class<S> listenerType, final T listener) {
+		return new WeakListenerWithType<S, T>(listenerType, listener);
 	}
 }

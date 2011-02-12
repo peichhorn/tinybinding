@@ -21,9 +21,7 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding.swing;
 
-import static de.fips.util.tinybinding.util.WeakReferences.weakListener;
-
-import java.lang.ref.WeakReference;
+import static de.fips.util.tinybinding.WeakReferences.weakListener;
 
 import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
@@ -35,7 +33,7 @@ import de.fips.util.tinybinding.util.Cast;
 /**
  * {@link ObservableValue} that can wrap the item selection of a {@link JList}.
  * <p>
- * <b>Note:</b> All used listeners are added as a {@link WeakReference WeakReferences}, so they gets
+ * <b>Note:</b> All used listeners are added as a {@link java.lang.ref.WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
  *
  * @param <T> Type of the observed list value.
@@ -46,7 +44,7 @@ class ObservableListValue<T> extends ObservableComponentValue<T, JList> implemen
 
 	public ObservableListValue(final JList component) {
 		super(component);
-		getComponent().addListSelectionListener(weakListener(ListSelectionListener.class, this, getComponent()));
+		getComponent().addListSelectionListener(weakListener(ListSelectionListener.class, this).withTarget(getComponent()).get());
 		guardedUpdateValue();
 	}
 

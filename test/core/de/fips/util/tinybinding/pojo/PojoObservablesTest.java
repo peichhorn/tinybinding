@@ -64,6 +64,16 @@ public class PojoObservablesTest {
 		text.set("42");
 		assertThat(pojo1.getText()).isEqualTo("42");
 	}
+	
+	@Test
+	public void test_observeValue_primitive() {
+		IObservableValue<Boolean> bool = observe(pojo1).property("bool", Boolean.class);
+		IValueObserver<Boolean> observer = uncheckedCast(mock(IValueObserver.class));
+		bool.addObserver(observer);
+		verify(observer, times(1)).valueChanged(any(Boolean.class), eq((Boolean) null));
+		bool.set(false);
+		assertThat(pojo1.isBool()).isFalse();
+	}
 
 	@Test
 	public void test_observeValue_setter_withoutPropertyChangeSupport() {
@@ -86,6 +96,7 @@ public class PojoObservablesTest {
 	@Data
 	public static class TestPojo1 {
 		private String text;
+		private boolean bool;
 	}
 
 	@NoArgsConstructor

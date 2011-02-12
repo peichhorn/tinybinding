@@ -21,13 +21,12 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding.swing;
 
-import static de.fips.util.tinybinding.util.WeakReferences.weakListener;
+import static de.fips.util.tinybinding.WeakReferences.weakListener;
 
 import java.awt.Container;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.lang.ref.WeakReference;
 
 import de.fips.util.tinybinding.ObservableValue;
 
@@ -36,7 +35,7 @@ import lombok.AutoGenMethodStub;
 /**
  * {@link ObservableValue} that can wrap the geometry of a Swing Component.
  * <p>
- * <b>Note:</b> All used listeners are added as a {@link WeakReference WeakReferences}, so they gets
+ * <b>Note:</b> All used listeners are added as a {@link java.lang.ref.WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
  *
  * @see ComponentListener
@@ -47,7 +46,7 @@ class ObservableBoundsValue extends ObservableComponentValue<Rectangle, Containe
 
 	public ObservableBoundsValue(final Container component) {
 		super(component);
-		getComponent().addComponentListener(weakListener(ComponentListener.class, this, getComponent()));
+		weakListener(ComponentListener.class, this).withTarget(getComponent()).add();
 	}
 
 	@Override

@@ -21,13 +21,12 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding.swing;
 
-import static de.fips.util.tinybinding.util.WeakReferences.weakListener;
+import static de.fips.util.tinybinding.WeakReferences.weakListener;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.ref.WeakReference;
 
 import javax.swing.JComboBox;
 
@@ -37,7 +36,7 @@ import de.fips.util.tinybinding.util.Cast;
 /**
  * {@link ObservableValue} that can wrap the value selection of a {@link JComboBox}.
  * <p>
- * <b>Note:</b> All used listeners are added as a {@link WeakReference WeakReferences}, so they gets
+ * <b>Note:</b> All used listeners are added as a {@link java.lang.ref.WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
  *
  * @see ActionListener
@@ -49,8 +48,8 @@ class ObservableComboBoxValue<T> extends ObservableComponentValue<T, JComboBox> 
 
 	public ObservableComboBoxValue(final JComboBox component) {
 		super(component);
-		getComponent().addActionListener(weakListener(ActionListener.class, this, getComponent()));
-		getComponent().addPropertyChangeListener("model", weakListener(PropertyChangeListener.class, this, getComponent()));
+		getComponent().addActionListener(weakListener(ActionListener.class, this).withTarget(getComponent()).get());
+		getComponent().addPropertyChangeListener("model", weakListener(PropertyChangeListener.class, this).withTarget(getComponent()).get());
 		guardedUpdateValue();
 	}
 

@@ -23,21 +23,20 @@ package de.fips.util.tinybinding.pojo;
 
 import static org.fest.reflect.core.Reflection.method;
 import static org.fest.reflect.core.Reflection.property;
+import static de.fips.util.tinybinding.WeakReferences.weakListener;
 import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
 import static de.fips.util.tinybinding.util.Reflection.getPrimitive;
 import static de.fips.util.tinybinding.util.Reflection.hasPrimitive;
-import static de.fips.util.tinybinding.util.WeakReferences.weakListener;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.ref.WeakReference;
 
 import org.fest.reflect.beanproperty.Invoker;
 import org.fest.reflect.exception.ReflectionError;
 
 import de.fips.util.tinybinding.ObservableValue;
+import de.fips.util.tinybinding.WeakReferences;
 import de.fips.util.tinybinding.util.Cast;
-import de.fips.util.tinybinding.util.WeakReferences;
 
 /**
  * {@link ObservableValue} implementation for POJOs.
@@ -47,8 +46,8 @@ import de.fips.util.tinybinding.util.WeakReferences;
  * If a {@link PropertyChangeListener} can be registered to the object the {@link ObservableValue} can
  * both receive and sumbit value-changes.
  * <p>
- * <b>Note:</b> The {@link PropertyChangeListener} is added as a {@link WeakReference}, so it gets
- * garbage collected when the time comes.
+ * <b>Note:</b> The {@link PropertyChangeListener} is added as a {@link java.lang.ref.WeakReference WeakReference},
+ * so it gets garbage collected when the time comes.
  *
  * @param <T> Type of the observed POJO field
  * @see WeakReferences
@@ -66,7 +65,7 @@ class PojoObservableValue<T> extends ObservableValue<T> implements PropertyChang
 		this.propertyType = propertyType;
 		try {
 			method("addPropertyChangeListener").withParameterTypes(String.class, PropertyChangeListener.class).in(pojo) //
-				.invoke(propertyName, weakListener(PropertyChangeListener.class, this, pojo));
+				.invoke(propertyName, weakListener(PropertyChangeListener.class, this).withTarget(pojo).get());
 		} catch (ReflectionError ignore) {
 			// ignore
 		}

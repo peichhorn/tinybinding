@@ -25,7 +25,6 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Tests the {@link DefaultConverter}.
@@ -33,7 +32,8 @@ import org.junit.rules.ExpectedException;
  * @author Philipp Eichhorn
  */
 public class DefaultConverterTest {
-	@Rule public ExpectedException thrown = ExpectedException.none();
+	@Rule
+	public final ExpectedException thrown = ExpectedException.none();
 
 	@Test
 	public void test_convert() {

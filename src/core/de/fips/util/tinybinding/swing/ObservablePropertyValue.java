@@ -22,14 +22,13 @@ THE SOFTWARE.
 package de.fips.util.tinybinding.swing;
 
 import static org.fest.reflect.core.Reflection.*;
+import static de.fips.util.tinybinding.WeakReferences.weakListener;
 import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
 import static de.fips.util.tinybinding.util.Reflection.*;
-import static de.fips.util.tinybinding.util.WeakReferences.weakListener;
 
 import java.awt.Container;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.ref.WeakReference;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -43,7 +42,7 @@ import de.fips.util.tinybinding.util.Cast;
 /**
  * {@link ObservableValue} that can wrap any named property of a Swing Component.
  * <p>
- * <b>Note:</b> All used listeners are added as a {@link WeakReference WeakReferences}, so they gets
+ * <b>Note:</b> All used listeners are added as a {@link java.lang.ref.WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
  *
  * @param <T> Type of the observed property.
@@ -59,13 +58,8 @@ class ObservablePropertyValue<T> extends ObservableComponentValue<T, Container> 
 		super(component);
 		this.propertyName = propertyName;
 		this.propertyType = propertyType;
-		getComponent().addPropertyChangeListener(propertyName, weakListener(PropertyChangeListener.class, this, getComponent()));
-		try {
-			method("addChangeListener").withParameterTypes(ChangeListener.class).in(getComponent()) //
-					.invoke(weakListener(ChangeListener.class, this, getComponent()));
-		} catch (ReflectionError ignore) {
-			// ignore
-		}
+		getComponent().addPropertyChangeListener(propertyName, weakListener(PropertyChangeListener.class, this).withTarget(getComponent()).get());
+		weakListener(ChangeListener.class, this).withTarget(getComponent()).add();
 		guardedUpdateValue();
 	}
 

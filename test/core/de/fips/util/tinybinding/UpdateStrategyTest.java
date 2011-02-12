@@ -27,6 +27,7 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -35,56 +36,61 @@ import org.junit.Test;
  * @author Philipp Eichhorn
  */
 public class UpdateStrategyTest {
+	@Rule
+	public final ExpectedException thrown = ExpectedException.none();
+	
 	private UpdateStrategy<Integer, String> updateStrategy;
 	private IValidator<Integer> afterGetValidator;
 	private IValidator<String> beforeSetValidator;
 	private IConverter<Integer, String> converter;
 
 	@Before
-	public void setUp() {
+	public void createMocks() {
 		afterGetValidator = uncheckedCast(mock(IValidator.class));
 		beforeSetValidator = uncheckedCast(mock(IValidator.class));
 		converter = uncheckedCast(mock(IConverter.class));
-		updateStrategy = new UpdateStrategy<Integer, String>(afterGetValidator, beforeSetValidator);
+		updateStrategy = new UpdateStrategy<Integer, String>(afterGetValidator, beforeSetValidator).converter(converter);
 	}
 
 	@Test
-	public void test_convert_calls_converter() {
-		String string;
-		try {
-			string = updateStrategy.convert(Integer.valueOf(10));
-			assertThat(false).describedAs("No Exception was thrown").isTrue();
-		} catch (Exception e) {
-			// expected
-		}
-		updateStrategy.converter(converter);
+	public void test_convertOnlyCallsConverter() {
 		doReturn("A String").when(converter).convert(eq(Integer.valueOf(10)));
-		string = updateStrategy.convert(Integer.valueOf(10));
-		verify(converter, times(1)).convert(eq(Integer.valueOf(10)));
+		String string = updateStrategy.convert(Integer.valueOf(10));
 		assertThat(string).isEqualTo("A String");
+		verify(converter, times(1)).convert(eq(Integer.valueOf(10)));
+		verifyZeroInteractions(beforeSetValidator, afterGetValidator);
+	}
+	
+	@Test
+	public void test_convertDoesNotCatchExceptionComingFromConverter() {
+		doThrow(new ClassCastException()).when(converter).convert(any(Integer.class));
+		thrown.expect(ClassCastException.class);
+		updateStrategy.convert(Integer.valueOf(10));
+	}
+	
+	@Test
+	public void test_doSetOnlyCallsSetOnValue() {
+		IObservableValue<String> value = uncheckedCast(mock(IObservableValue.class));
+		updateStrategy.doSet(value, "A String");
+		verify(value, times(1)).set(eq("A String"));
+		verifyZeroInteractions(beforeSetValidator, afterGetValidator, converter);
 	}
 
 	@Test
-	public void test_validateAfterGet_calls_validator() {
+	public void test_validateAfterGetOnlyCallsAfterGetValidator() {
 		doReturn(true).when(afterGetValidator).validate(eq(Integer.valueOf(10)));
 		assertThat(updateStrategy.validateAfterGet(Integer.valueOf(10))).isTrue();
 		assertThat(updateStrategy.validateAfterGet(Integer.valueOf(20))).isFalse();
-		afterGetValidator = uncheckedCast(mock(IValidator.class));
-		doReturn(true).when(afterGetValidator).validate(eq(Integer.valueOf(20)));
-		updateStrategy.afterGetValidator(afterGetValidator);
-		assertThat(updateStrategy.validateAfterGet(Integer.valueOf(20))).isTrue();
-		assertThat(updateStrategy.validateAfterGet(Integer.valueOf(10))).isFalse();
+		verify(afterGetValidator, times(2)).validate(any(Integer.class));
+		verifyZeroInteractions(beforeSetValidator, converter);
 	}
 
 	@Test
-	public void test_validateBeforeSet_calls_validator() {
+	public void test_validateBeforeSetOnlyCallsBeforeSetValidator() {
 		doReturn(true).when(beforeSetValidator).validate(eq("Hello"));
 		assertThat(updateStrategy.validateBeforeSet("Hello")).isTrue();
 		assertThat(updateStrategy.validateBeforeSet("You")).isFalse();
-		beforeSetValidator = uncheckedCast(mock(IValidator.class));
-		doReturn(true).when(beforeSetValidator).validate(eq("You"));
-		updateStrategy.beforeSetValidator(beforeSetValidator);
-		assertThat(updateStrategy.validateBeforeSet("You")).isTrue();
-		assertThat(updateStrategy.validateBeforeSet("Hello")).isFalse();
+		verify(beforeSetValidator, times(2)).validate(any(String.class));
+		verifyZeroInteractions(afterGetValidator, converter);
 	}
 }

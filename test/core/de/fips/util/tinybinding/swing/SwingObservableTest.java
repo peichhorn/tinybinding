@@ -32,9 +32,11 @@ import java.awt.Color;
 import java.awt.Rectangle;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
@@ -55,14 +57,15 @@ import de.fips.util.tinybinding.IValueObserver;
  *
  * @author Philipp Eichhorn
  */
-public class SwingObservablesTest extends ComponentTestFixture {
-	private JFrame frame;
-	private JButton button1;
-	private JButton button2;
-	private JPanel mainPanel;
-	private JTextArea textArea;
-	private JComboBox combobox;
-	private JSpinner spinner;
+public class SwingObservableTest extends ComponentTestFixture {
+	protected JFrame frame;
+	protected JButton button1;
+	protected JButton button2;
+	protected JPanel mainPanel;
+	protected JTextArea textArea;
+	protected JComboBox combobox;
+	protected JSpinner spinner;
+	protected JList list;
 
 	@Before
 	@Override
@@ -71,9 +74,16 @@ public class SwingObservablesTest extends ComponentTestFixture {
 		textArea = new JTextArea();
 		button1 = new JButton("Unfocused Button");
 		button2 = new JButton("Focused Button");
+		list = new JList();
+		DefaultListModel listModel = new DefaultListModel();
+		listModel.addElement("Item 1");
+		listModel.addElement("Item 2");
+		listModel.addElement("Item 3");
+		list.setModel(listModel);
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new BorderLayout());
 		buttonPanel.add(button1, BorderLayout.WEST);
+		buttonPanel.add(list, BorderLayout.CENTER);
 		buttonPanel.add(button2, BorderLayout.EAST);
 		combobox = new JComboBox();
 		DefaultComboBoxModel model = new DefaultComboBoxModel();
@@ -122,6 +132,9 @@ public class SwingObservablesTest extends ComponentTestFixture {
 		mainPanel.setBounds(new Rectangle(0, 0, 40, 40));
 		getRobot().waitForIdle();
 		verify(observer, times(1)).valueChanged(eq(new Rectangle(0, 0, 40, 40)), any(Rectangle.class));
+		mainPanel.setBounds(new Rectangle(20, 20, 40, 40));
+		getRobot().waitForIdle();
+		verify(observer, times(1)).valueChanged(eq(new Rectangle(20, 20, 40, 40)), eq(new Rectangle(0, 0, 40, 40)));
 	}
 
 	@Test
@@ -210,6 +223,9 @@ public class SwingObservablesTest extends ComponentTestFixture {
 		textArea.setText("TextComponent Text");
 		getRobot().waitForIdle();
 		verify(observer, times(1)).valueChanged(eq("TextComponent Text"), any(String.class));
+		textArea.replaceRange("", 1, 5);
+		getRobot().waitForIdle();
+		verify(observer, times(1)).valueChanged(eq("Tomponent Text"), eq("TextComponent Text"));
 	}
 
 	@Test
@@ -268,6 +284,17 @@ public class SwingObservablesTest extends ComponentTestFixture {
 		spinner.setValue(Long.valueOf(10));
 		getRobot().waitForIdle();
 		verify(observer, times(1)).valueChanged(eq(Long.valueOf(10)), any(Long.class));
+	}
+	
+	@Test
+	public void test_observeValue_List() {
+		IObservableValue<String> value = observe(list).value();
+		IValueObserver<String> observer = uncheckedCast(mock(IValueObserver.class));
+		value.addObserver(observer);
+		verify(observer, times(1)).valueChanged(any(String.class), eq((String) null));
+		list.setSelectedValue("Item 2", true);
+		getRobot().waitForIdle();
+		verify(observer, times(1)).valueChanged(eq("Item 2"), any(String.class));
 	}
 
 	@Test

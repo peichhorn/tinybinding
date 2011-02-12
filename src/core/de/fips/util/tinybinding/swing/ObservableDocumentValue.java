@@ -21,11 +21,10 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding.swing;
 
-import static de.fips.util.tinybinding.util.WeakReferences.weakListener;
+import static de.fips.util.tinybinding.WeakReferences.weakListener;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.ref.WeakReference;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -38,7 +37,7 @@ import de.fips.util.tinybinding.ObservableValue;
 /**
  * {@link ObservableValue} that can wrap the document text of a {@link JTextComponent}.
  * <p>
- * <b>Note:</b> All used listeners are added as a {@link WeakReference WeakReferences}, so they gets
+ * <b>Note:</b> All used listeners are added as a {@link java.lang.ref.WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
  *
  * @see DocumentListener
@@ -51,9 +50,9 @@ class ObservableDocumentValue extends ObservableComponentValue<String, JTextComp
 
 	public ObservableDocumentValue(final JTextComponent component) {
 		super(component);
-		getComponent().addPropertyChangeListener("document", weakListener(PropertyChangeListener.class, this, getComponent()));
+		getComponent().addPropertyChangeListener("document", weakListener(PropertyChangeListener.class, this).withTarget(getComponent()).get());
 		document = getComponent().getDocument();
-		weakDocumentListener = weakListener(DocumentListener.class, this, document);
+		weakDocumentListener = weakListener(DocumentListener.class, this).withTarget(document).get();
 		document.addDocumentListener(weakDocumentListener);
 		guardedUpdateValue();
 	}
@@ -77,7 +76,7 @@ class ObservableDocumentValue extends ObservableComponentValue<String, JTextComp
 	public void propertyChange(final PropertyChangeEvent event) {
 		document.removeDocumentListener(weakDocumentListener);
 		document = (Document) event.getNewValue();
-		weakDocumentListener = weakListener(DocumentListener.class, this, document);
+		weakDocumentListener = weakListener(DocumentListener.class, this).withTarget(document).get();
 		document.addDocumentListener(weakDocumentListener);
 		guardedUpdateValue();
 	}

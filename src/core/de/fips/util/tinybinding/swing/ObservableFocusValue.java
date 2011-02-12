@@ -21,19 +21,18 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding.swing;
 
-import static de.fips.util.tinybinding.util.WeakReferences.weakListener;
+import static de.fips.util.tinybinding.WeakReferences.weakListener;
 
 import java.awt.Container;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.lang.ref.WeakReference;
 
 import de.fips.util.tinybinding.ObservableValue;
 
 /**
  * {@link ObservableValue} that can wrap the focus state of a Swing Component.
  * <p>
- * <b>Note:</b> All used listeners are added as a {@link WeakReference WeakReferences}, so they gets
+ * <b>Note:</b> All used listeners are added as a {@link java.lang.ref.WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
  *
  * @see FocusListener
@@ -43,7 +42,7 @@ class ObservableFocusValue extends ObservableComponentValue<Boolean, Container> 
 
 	public ObservableFocusValue(final Container component) {
 		super(component);
-		getComponent().addFocusListener(weakListener(FocusListener.class, this, getComponent()));
+		getComponent().addFocusListener(weakListener(FocusListener.class, this).withTarget(getComponent()).get());
 	}
 
 	@Override
