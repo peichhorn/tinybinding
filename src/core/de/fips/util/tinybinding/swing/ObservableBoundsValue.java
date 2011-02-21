@@ -46,7 +46,7 @@ class ObservableBoundsValue extends ObservableComponentValue<Rectangle, Containe
 
 	public ObservableBoundsValue(final Container component) {
 		super(component);
-		weakListener(ComponentListener.class, this).withTarget(getComponent()).add();
+		component.addComponentListener(weakListener(ComponentListener.class, this).createFor(getComponent()));
 	}
 
 	@Override

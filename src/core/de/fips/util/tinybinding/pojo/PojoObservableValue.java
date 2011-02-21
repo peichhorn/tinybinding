@@ -65,7 +65,7 @@ class PojoObservableValue<T> extends ObservableValue<T> implements PropertyChang
 		this.propertyType = propertyType;
 		try {
 			method("addPropertyChangeListener").withParameterTypes(String.class, PropertyChangeListener.class).in(pojo) //
-				.invoke(propertyName, weakListener(PropertyChangeListener.class, this).withTarget(pojo).get());
+				.invoke(propertyName, weakListener(PropertyChangeListener.class, this).createFor(pojo));
 		} catch (ReflectionError ignore) {
 			// ignore
 		}

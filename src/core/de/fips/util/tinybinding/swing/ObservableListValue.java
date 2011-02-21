@@ -44,7 +44,7 @@ class ObservableListValue<T> extends ObservableComponentValue<T, JList> implemen
 
 	public ObservableListValue(final JList component) {
 		super(component);
-		getComponent().addListSelectionListener(weakListener(ListSelectionListener.class, this).withTarget(getComponent()).get());
+		getComponent().addListSelectionListener(weakListener(ListSelectionListener.class, this).createFor(getComponent()));
 		guardedUpdateValue();
 	}
 

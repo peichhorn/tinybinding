@@ -52,7 +52,7 @@ public class WeakListenerTest {
 	public void test_weakActionListener() {
 		ActionListener listener = mock(ActionListener.class);
 		JButton button = mock(JButton.class);
-		ActionListener weakListener = weakListener(ActionListener.class, listener).withTarget(button).get();
+		ActionListener weakListener = weakListener(ActionListener.class, listener).createFor(button);
 		weakListener.actionPerformed(mock(ActionEvent.class));
 		verify(listener, times(1)).actionPerformed(any(ActionEvent.class));
 		listener = null;
@@ -65,7 +65,7 @@ public class WeakListenerTest {
 	public void test_weakPropertyChangeListener() {
 		PropertyChangeListener listener = mock(PropertyChangeListener.class);
 		SimpleBean bean = mock(SimpleBean.class);
-		PropertyChangeListener weakListener = weakListener(PropertyChangeListener.class, listener).withTarget(bean).get();
+		PropertyChangeListener weakListener = weakListener(PropertyChangeListener.class, listener).createFor(bean);
 		weakListener.propertyChange(mock(PropertyChangeEvent.class));
 		verify(listener, times(1)).propertyChange(any(PropertyChangeEvent.class));
 		listener = null;

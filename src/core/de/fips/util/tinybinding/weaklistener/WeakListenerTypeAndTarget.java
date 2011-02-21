@@ -64,11 +64,13 @@ public final class WeakListenerTypeAndTarget<S, T extends S> {
 		return listenerType.cast(weakListener);
 	}
 	
-	public void add() {
+	public S add() {
+		final S listener = get();
 		try {
-			method("add" + listenerType.getSimpleName()).withParameterTypes(listenerType).in(target).invoke(get());
+			method("add" + listenerType.getSimpleName()).withParameterTypes(listenerType).in(target).invoke(listener);
 		} catch (ReflectionError ignore) {
 			// ignore
 		}
+		return listener;
 	}
 }

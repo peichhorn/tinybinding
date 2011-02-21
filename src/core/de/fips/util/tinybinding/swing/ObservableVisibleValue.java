@@ -46,7 +46,7 @@ class ObservableVisibleValue extends ObservableComponentValue<Boolean, Container
 
 	public ObservableVisibleValue(final Container component) {
 		super(component);
-		weakListener(ComponentListener.class, this).withTarget(getComponent()).add();
+		component.addComponentListener(weakListener(ComponentListener.class, this).createFor(getComponent()));
 		guardedUpdateValue();
 	}
 

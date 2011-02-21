@@ -50,9 +50,9 @@ class ObservableDocumentValue extends ObservableComponentValue<String, JTextComp
 
 	public ObservableDocumentValue(final JTextComponent component) {
 		super(component);
-		getComponent().addPropertyChangeListener("document", weakListener(PropertyChangeListener.class, this).withTarget(getComponent()).get());
+		getComponent().addPropertyChangeListener("document", weakListener(PropertyChangeListener.class, this).createFor(getComponent()));
 		document = getComponent().getDocument();
-		weakDocumentListener = weakListener(DocumentListener.class, this).withTarget(document).get();
+		weakDocumentListener = weakListener(DocumentListener.class, this).createFor(document);
 		document.addDocumentListener(weakDocumentListener);
 		guardedUpdateValue();
 	}
@@ -76,7 +76,7 @@ class ObservableDocumentValue extends ObservableComponentValue<String, JTextComp
 	public void propertyChange(final PropertyChangeEvent event) {
 		document.removeDocumentListener(weakDocumentListener);
 		document = (Document) event.getNewValue();
-		weakDocumentListener = weakListener(DocumentListener.class, this).withTarget(document).get();
+		weakDocumentListener = weakListener(DocumentListener.class, this).createFor(document);
 		document.addDocumentListener(weakDocumentListener);
 		guardedUpdateValue();
 	}

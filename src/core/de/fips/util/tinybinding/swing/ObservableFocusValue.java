@@ -42,7 +42,7 @@ class ObservableFocusValue extends ObservableComponentValue<Boolean, Container> 
 
 	public ObservableFocusValue(final Container component) {
 		super(component);
-		getComponent().addFocusListener(weakListener(FocusListener.class, this).withTarget(getComponent()).get());
+		getComponent().addFocusListener(weakListener(FocusListener.class, this).createFor(getComponent()));
 	}
 
 	@Override

@@ -58,8 +58,8 @@ class ObservablePropertyValue<T> extends ObservableComponentValue<T, Container> 
 		super(component);
 		this.propertyName = propertyName;
 		this.propertyType = propertyType;
-		getComponent().addPropertyChangeListener(propertyName, weakListener(PropertyChangeListener.class, this).withTarget(getComponent()).get());
-		weakListener(ChangeListener.class, this).withTarget(getComponent()).add();
+		getComponent().addPropertyChangeListener(propertyName, weakListener(PropertyChangeListener.class, this).createFor(getComponent()));
+		weakListener(ChangeListener.class, this).addTo(getComponent());
 		guardedUpdateValue();
 	}
 

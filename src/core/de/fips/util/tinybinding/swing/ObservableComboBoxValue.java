@@ -48,8 +48,8 @@ class ObservableComboBoxValue<T> extends ObservableComponentValue<T, JComboBox> 
 
 	public ObservableComboBoxValue(final JComboBox component) {
 		super(component);
-		getComponent().addActionListener(weakListener(ActionListener.class, this).withTarget(getComponent()).get());
-		getComponent().addPropertyChangeListener("model", weakListener(PropertyChangeListener.class, this).withTarget(getComponent()).get());
+		getComponent().addActionListener(weakListener(ActionListener.class, this).createFor(getComponent()));
+		getComponent().addPropertyChangeListener("model", weakListener(PropertyChangeListener.class, this).createFor(getComponent()));
 		guardedUpdateValue();
 	}
 

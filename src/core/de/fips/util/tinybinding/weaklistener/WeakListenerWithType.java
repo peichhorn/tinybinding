@@ -31,4 +31,12 @@ public final class WeakListenerWithType<S, T extends S> {
 	public WeakListenerTypeAndTarget<S, T> withTarget(final Object target) {
 		return new WeakListenerTypeAndTarget<S, T>(listenerType, listener, target);
 	}
+	
+	public S addTo(final Object target) {
+		return withTarget(target).add();
+	}
+	
+	public S createFor(final Object target) {
+		return withTarget(target).get();
+	}
 }
