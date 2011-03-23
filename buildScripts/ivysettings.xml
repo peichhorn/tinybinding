@@ -5,7 +5,9 @@
       <filesystem name="projectLocalRepo">
         <ivy pattern="${ivy.settings.dir}/ivy-repo/[organization]-[module]-[revision].xml" />
       </filesystem>
-      <ibiblio name="maven-repo2" m2compatible="true" root="http://repo1.maven.org/maven2/" />
+      <ibiblio name="repo1" m2compatible="true" root="http://repo1.maven.org/maven2/" />
+      <ibiblio name="laughinpanda" m2compatible="true" root="http://www.laughingpanda.org/maven2/" />
+      <ibiblio name="codehaus" m2compatible="true" root="http://repository.codehaus.org" />
     </chain>
   </resolvers>
   <settings defaultResolver="projectRepos" />

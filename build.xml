@@ -97,7 +97,8 @@ the common tasks and can be called on to run the main aspects of all the sub-scr
   <!-- dist -->
   <target name="dist" description="Builds THE tinybinding.jar file which contains everything." depends="compile">
     <mkdir dir="dist" />
-    <jar destfile="dist/tinybinding.jar">
+  	<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/build/jarjar.jar" />
+    <jarjar destfile="dist/tinybinding.jar">
       <fileset dir="build/tinybinding" />
       <zipfileset src="lib/build/fest-reflect.jar">
         <exclude name="**/constructor/**" />
@@ -105,12 +106,14 @@ the common tasks and can be called on to run the main aspects of all the sub-scr
         <exclude name="**/innerclass/**" />
       </zipfileset>
       <zipfileset src="lib/build/fest-util.jar">
-        <include name="**/Array*.class" />
-        <include name="**/String*.class" />
+        <include name="**/*Array*.class" />
+        <include name="**/*String*.class" />
+        <include name="**/*Object*.class" />
       </zipfileset>
+        <rule pattern="org.fest.**" result="lib.org.fest.@1" />
       <fileset dir="." includes="LICENSE" />
       <fileset dir="." includes="FEST_LICENSE" />
-    </jar>
+    </jarjar>
     <property name="tinybinding.dist.built" value="true" />
   </target>
   
