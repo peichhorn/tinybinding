@@ -110,7 +110,7 @@ the common tasks and can be called on to run the main aspects of all the sub-scr
         <include name="**/*String*.class" />
         <include name="**/*Object*.class" />
       </zipfileset>
-        <rule pattern="org.fest.**" result="lib.org.fest.@1" />
+        <rule pattern="org.fest.**" result="de.fips.util.tinybinding.lib.org.fest.@1" />
       <fileset dir="." includes="LICENSE" />
       <fileset dir="." includes="FEST_LICENSE" />
     </jarjar>
