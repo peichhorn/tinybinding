@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @FluentSetter
-public final class UpdateStrategy<SOURCE_TYPE, TARGET_TYPE> implements IUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> {
+public class UpdateStrategy<SOURCE_TYPE, TARGET_TYPE> implements IUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> {
 	private IValidator<SOURCE_TYPE> afterGetValidator;
 	private IValidator<TARGET_TYPE> beforeSetValidator;
 	private IConverter<SOURCE_TYPE, TARGET_TYPE> converter = new DefaultConverter<SOURCE_TYPE, TARGET_TYPE>();

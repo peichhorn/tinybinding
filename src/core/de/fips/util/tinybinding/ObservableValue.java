@@ -43,7 +43,7 @@ public class ObservableValue<TYPE> implements IObservableValue<TYPE> {
 	}
 
 	@Override
-	public final TYPE get() {
+	public TYPE get() {
 		return value;
 	}
 
