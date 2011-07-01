@@ -19,9 +19,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package de.fips.util.tinybinding;
+package de.fips.util.tinybinding.impl;
 
-import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Iterator;
@@ -30,6 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import de.fips.util.tinybinding.IMapObserver;
+import de.fips.util.tinybinding.IObservableMap;
 import de.fips.util.tinybinding.util.Cast;
 
 import lombok.Delegate;
@@ -40,15 +41,15 @@ import lombok.RequiredArgsConstructor;
  * @author Philipp Eichhorn
  */
 @RequiredArgsConstructor
-public class ObservableMap<K, V> extends AbstractMap<K, V> implements IObservableMap<K, V> {
-	@Delegate
-	private final Map<K, V> map;
-	private final List<IMapObserver<K, V>> registeredObservers = new CopyOnWriteArrayList<IMapObserver<K, V>>();
-	private Set<Map.Entry<K, V>> entrySet;
+public class ObservableMap<KEY_TYPE, VALUE_TYPE> extends AbstractMap<KEY_TYPE, VALUE_TYPE> implements IObservableMap<KEY_TYPE, VALUE_TYPE> {
+	@Delegate(excludes = IMap.class)
+	private final Map<KEY_TYPE, VALUE_TYPE> map;
+	private final List<IMapObserver<KEY_TYPE, VALUE_TYPE>> registeredObservers = new CopyOnWriteArrayList<IMapObserver<KEY_TYPE, VALUE_TYPE>>();
+	private Set<Map.Entry<KEY_TYPE, VALUE_TYPE>> entrySet;
 
 	@Override
 	public void clear() {
-		Iterator<K> iterator = keySet().iterator();
+		Iterator<KEY_TYPE> iterator = keySet().iterator();
 		while (iterator.hasNext()) {
 			iterator.next();
 			iterator.remove();
@@ -56,20 +57,20 @@ public class ObservableMap<K, V> extends AbstractMap<K, V> implements IObservabl
 	}
 
 	@Override
-	public Set<Map.Entry<K, V>> entrySet() {
-		Set<Map.Entry<K, V>> es = entrySet;
+	public Set<Map.Entry<KEY_TYPE, VALUE_TYPE>> entrySet() {
+		Set<Map.Entry<KEY_TYPE, VALUE_TYPE>> es = entrySet;
 		return es != null ? es : (entrySet = new EntrySet());
 	}
 
 	@Override
-	public V put(final K key, final V value) {
-		V lastValue = map.put(key, value);
+	public VALUE_TYPE put(final KEY_TYPE key, final VALUE_TYPE value) {
+		VALUE_TYPE lastValue = map.put(key, value);
 		if (containsKey(key)) {
-			for (IMapObserver<K, V> observer : registeredObservers) {
+			for (IMapObserver<KEY_TYPE, VALUE_TYPE> observer : registeredObservers) {
 				observer.valueChanged(this, key, lastValue);
 			}
 		} else {
-			for (IMapObserver<K, V> observer : registeredObservers) {
+			for (IMapObserver<KEY_TYPE, VALUE_TYPE> observer : registeredObservers) {
 				observer.valueAdded(this, key);
 			}
 		}
@@ -77,18 +78,18 @@ public class ObservableMap<K, V> extends AbstractMap<K, V> implements IObservabl
 	}
 
 	@Override
-	public void putAll(final Map<? extends K, ? extends V> m) {
-		for (Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
+	public void putAll(final Map<? extends KEY_TYPE, ? extends VALUE_TYPE> m) {
+		for (Map.Entry<? extends KEY_TYPE, ? extends VALUE_TYPE> entry : m.entrySet()) {
 			put(entry.getKey(), entry.getValue());
 		}
 	}
 
 	@Override
-	public V remove(final Object o) {
+	public VALUE_TYPE remove(final Object o) {
 		if (containsKey(o)) {
-			V value = map.remove(o);
-			K key = Cast.<K>uncheckedCast(o);
-			for (IMapObserver<K, V> observer : registeredObservers) {
+			VALUE_TYPE value = map.remove(o);
+			KEY_TYPE key = Cast.<KEY_TYPE>uncheckedCast(o);
+			for (IMapObserver<KEY_TYPE, VALUE_TYPE> observer : registeredObservers) {
 				observer.valueRemoved(this, key, value);
 			}
 			return value;
@@ -97,20 +98,20 @@ public class ObservableMap<K, V> extends AbstractMap<K, V> implements IObservabl
 	}
 
 	@Override
-	public void addObserver(final IMapObserver<K, V> observer) {
+	public void addObserver(final IMapObserver<KEY_TYPE, VALUE_TYPE> observer) {
 		if (!registeredObservers.contains(observer)) {
 			registeredObservers.add(observer);
 		}
 	}
 
 	@Override
-	public void removeObserver(final IMapObserver<K, V> observer) {
+	public void removeObserver(final IMapObserver<KEY_TYPE, VALUE_TYPE> observer) {
 		registeredObservers.remove(observer);
 	}
 
-	private class EntryIterator implements Iterator<Map.Entry<K, V>> {
-		private final Iterator<Map.Entry<K, V>> iterator = map.entrySet().iterator();
-		private Map.Entry<K, V> last;
+	private class EntryIterator implements Iterator<Map.Entry<KEY_TYPE, VALUE_TYPE>> {
+		private final Iterator<Map.Entry<KEY_TYPE, VALUE_TYPE>> iterator = map.entrySet().iterator();
+		private Map.Entry<KEY_TYPE, VALUE_TYPE> last;
 
 		@Override
 		public boolean hasNext() {
@@ -118,7 +119,7 @@ public class ObservableMap<K, V> extends AbstractMap<K, V> implements IObservabl
 		}
 
 		@Override
-		public Map.Entry<K, V> next() {
+		public Map.Entry<KEY_TYPE, VALUE_TYPE> next() {
 			last = iterator.next();
 			return last;
 		}
@@ -134,9 +135,9 @@ public class ObservableMap<K, V> extends AbstractMap<K, V> implements IObservabl
 		}
 	}
 
-	private class EntrySet extends AbstractSet<Map.Entry<K, V>> {
+	private class EntrySet extends AbstractSet<Map.Entry<KEY_TYPE, VALUE_TYPE>> {
 		@Override
-		public Iterator<Map.Entry<K, V>> iterator() {
+		public Iterator<Map.Entry<KEY_TYPE, VALUE_TYPE>> iterator() {
 			return new EntryIterator();
 		}
 
@@ -145,15 +146,15 @@ public class ObservableMap<K, V> extends AbstractMap<K, V> implements IObservabl
 			if (!(o instanceof Map.Entry)) {
 				return false;
 			}
-			Map.Entry<K, V> e = uncheckedCast(o);
+			Map.Entry<KEY_TYPE, VALUE_TYPE> e = Cast.uncheckedCast(o);
 			return containsKey(e.getKey());
 		}
 
 		@Override
 		public boolean remove(final Object o) {
 			if (o instanceof Map.Entry) {
-				Map.Entry<K, V> entry = uncheckedCast(o);
-				K key = entry.getKey();
+				Map.Entry<KEY_TYPE, VALUE_TYPE> entry = Cast.uncheckedCast(o);
+				KEY_TYPE key = entry.getKey();
 				if (containsKey(key)) {
 					remove(key);
 					return true;
@@ -171,5 +172,13 @@ public class ObservableMap<K, V> extends AbstractMap<K, V> implements IObservabl
 		public void clear() {
 			ObservableMap.this.clear();
 		}
+	}
+
+	private static interface IMap<K, V> {
+		void clear();
+		Set<Map.Entry<K, V>> entrySet();
+		V put(final K key, final V value);
+		void putAll(final Map<? extends K, ? extends V> m);
+		V remove(final Object o);
 	}
 }

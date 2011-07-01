@@ -31,11 +31,11 @@ public interface IObservableValue<TYPE> {
 
 	public TYPE get();
 
-	public boolean set(final TYPE value);
+	public boolean set(TYPE value);
 
-	public void addObserver(final IValueObserver<TYPE> observer);
+	public void addObserver(IValueObserver<TYPE> observer);
 
-	public void addObserver(final IValueObserver<TYPE> observer, final boolean emitValueChanged);
+	public void addObserver(IValueObserver<TYPE> observer, boolean emitValueChanged);
 
-	public void removeObserver(final IValueObserver<TYPE> observer);
+	public void removeObserver(IValueObserver<TYPE> observer);
 }

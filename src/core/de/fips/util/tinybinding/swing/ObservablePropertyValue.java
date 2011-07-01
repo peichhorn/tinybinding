@@ -36,25 +36,24 @@ import javax.swing.event.ChangeListener;
 import org.fest.reflect.beanproperty.Invoker;
 import org.fest.reflect.exception.ReflectionError;
 
-import de.fips.util.tinybinding.ObservableValue;
 import de.fips.util.tinybinding.util.Cast;
 
 /**
- * {@link ObservableValue} that can wrap any named property of a Swing Component.
+ * {@link de.fips.util.tinybinding.impl.ObservableValue ObservableValue} that can wrap any named property of a Swing Component.
  * <p>
  * <b>Note:</b> All used listeners are added as a {@link java.lang.ref.WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
  *
- * @param <T> Type of the observed property.
+ * @param <TYPE> Type of the observed property.
  * @see PropertyChangeListener
  * @see ChangeListener
  * @author Philipp Eichhorn
  */
-class ObservablePropertyValue<T> extends ObservableComponentValue<T, Container> implements PropertyChangeListener, ChangeListener {
+class ObservablePropertyValue<TYPE> extends ObservableComponentValue<TYPE, Container> implements PropertyChangeListener, ChangeListener {
 	private final String propertyName;
-	private final Class<T> propertyType;
+	private final Class<TYPE> propertyType;
 
-	public ObservablePropertyValue(final String propertyName, final Class<T> propertyType, final Container component) {
+	public ObservablePropertyValue(final String propertyName, final Class<TYPE> propertyType, final Container component) {
 		super(component);
 		this.propertyName = propertyName;
 		this.propertyType = propertyType;
@@ -70,11 +69,11 @@ class ObservablePropertyValue<T> extends ObservableComponentValue<T, Container> 
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
-		guardedSetValue(Cast.<T>uncheckedCast(event.getNewValue()));
+		guardedSetValue(Cast.<TYPE>uncheckedCast(event.getNewValue()));
 	}
 
 	@Override
-	protected void guardedDoSet(final T value) {
+	protected void guardedDoSet(final TYPE value) {
 		try {
 			if (value != null) getInvoker().set(value);
 		} catch (ReflectionError e) {
@@ -83,7 +82,7 @@ class ObservablePropertyValue<T> extends ObservableComponentValue<T, Container> 
 	}
 
 	@Override
-	public T getComponentValue() {
+	public TYPE getComponentValue() {
 		try {
 			return getInvoker().get();
 		} catch (ReflectionError e) {
@@ -91,12 +90,12 @@ class ObservablePropertyValue<T> extends ObservableComponentValue<T, Container> 
 		}
 	}
 
-	private Invoker<T> getInvoker() {
+	private Invoker<TYPE> getInvoker() {
 		try {
 			return property(propertyName).ofType(propertyType).in(getComponent());
 		} catch (ReflectionError e) {
 			if (hasPrimitive(propertyType)) {
-				final Invoker<T> invoker = uncheckedCast(property(propertyName).ofType(getPrimitive(propertyType)).in(getComponent()));
+				final Invoker<TYPE> invoker = uncheckedCast(property(propertyName).ofType(getPrimitive(propertyType)).in(getComponent()));
 				return invoker;
 			} else throw e;
 		}

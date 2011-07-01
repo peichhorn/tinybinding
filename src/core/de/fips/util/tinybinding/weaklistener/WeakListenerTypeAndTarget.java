@@ -41,7 +41,7 @@ public final class WeakListenerTypeAndTarget<S, T extends S> {
 	private final Class<S> listenerType;
 	private final T listener;
 	final Object target;
-	
+
 	public S get() {
 		final Object weakListener;
 		if (ActionListener.class.isAssignableFrom(listenerType)) {
@@ -63,7 +63,7 @@ public final class WeakListenerTypeAndTarget<S, T extends S> {
 		}
 		return listenerType.cast(weakListener);
 	}
-	
+
 	public S add() {
 		final S listener = get();
 		try {

@@ -26,7 +26,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
- * Creates all kinds of useful {@link WeakReference WeakReferences}.
+ * Creates all kinds of useful {@link java.lang.ref.WeakReference WeakReferences}.
  *
  * @author Philipp Eichhorn
  */

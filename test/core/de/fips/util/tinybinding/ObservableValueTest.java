@@ -21,11 +21,14 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding;
 
+import static de.fips.util.tinybinding.Observables.observe;
 import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import org.junit.Test;
+
+import de.fips.util.tinybinding.impl.ObservableValue;
 
 /**
  * Tests the {@link ObservableValue}.
@@ -35,19 +38,19 @@ import org.junit.Test;
 public class ObservableValueTest {
 	@Test
 	public void test_nil() {
-		ObservableValue<Integer> value = ObservableValue.nil();
+		IObservableValue<Integer> value = observe().nil();
 		assertThat(value.get()).isNull();
 	}
 
 	@Test
 	public void test_of() {
-		ObservableValue<Integer> value = ObservableValue.of(100);
+		IObservableValue<Integer> value = observe().value(100);
 		assertThat(value.get()).isEqualTo(Integer.valueOf(100));
 	}
 
 	@Test
 	public void test_setValue_changesValue() {
-		ObservableValue<Integer> value = ObservableValue.of(100);
+		IObservableValue<Integer> value = observe().value(100);
 		assertThat(value.get()).isEqualTo(Integer.valueOf(100));
 		value.set(50);
 		assertThat(value.get()).isEqualTo(Integer.valueOf(50));
@@ -55,7 +58,7 @@ public class ObservableValueTest {
 
 	@Test
 	public void test_setValue_notifiesValueObserver() {
-		ObservableValue<Integer> value = ObservableValue.of(100);
+		IObservableValue<Integer> value = observe().value(100);
 		IValueObserver<Integer> observer = uncheckedCast(mock(IValueObserver.class));
 		value.addObserver(observer);
 		value.set(50);

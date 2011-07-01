@@ -28,12 +28,10 @@ import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
-import de.fips.util.tinybinding.ObservableValue;
-
 import lombok.AutoGenMethodStub;
 
 /**
- * {@link ObservableValue} that can wrap the geometry of a Swing Component.
+ * {@link de.fips.util.tinybinding.impl.ObservableValue ObservableValue} that can wrap the geometry of a Swing Component.
  * <p>
  * <b>Note:</b> All used listeners are added as a {@link java.lang.ref.WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
@@ -47,6 +45,7 @@ class ObservableBoundsValue extends ObservableComponentValue<Rectangle, Containe
 	public ObservableBoundsValue(final Container component) {
 		super(component);
 		component.addComponentListener(weakListener(ComponentListener.class, this).createFor(getComponent()));
+		guardedUpdateValue();
 	}
 
 	@Override

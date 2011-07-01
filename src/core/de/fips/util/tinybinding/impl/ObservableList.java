@@ -19,7 +19,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package de.fips.util.tinybinding;
+package de.fips.util.tinybinding.impl;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -27,6 +27,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import de.fips.util.tinybinding.IListObserver;
+import de.fips.util.tinybinding.IObservableList;
 
 import lombok.Delegate;
 import lombok.RequiredArgsConstructor;
@@ -36,49 +39,49 @@ import lombok.RequiredArgsConstructor;
  * @author Philipp Eichhorn
  */
 @RequiredArgsConstructor
-public class ObservableList<E> extends AbstractList<E> implements IObservableList<E> {
-	@Delegate
-	private final List<E> list;
-	private final List<IListObserver<E>> registeredObservers = new CopyOnWriteArrayList<IListObserver<E>>();
+public class ObservableList<ELEMENT_TYPE> extends AbstractList<ELEMENT_TYPE> implements IObservableList<ELEMENT_TYPE> {
+	@Delegate(excludes = IList.class)
+	private final List<ELEMENT_TYPE> list;
+	private final List<IListObserver<ELEMENT_TYPE>> registeredObservers = new CopyOnWriteArrayList<IListObserver<ELEMENT_TYPE>>();
 
 	@Override
-	public E set(final int index, final E element) {
-		E oldValue = list.set(index, element);
-		for (IListObserver<E> observer : registeredObservers) {
+	public ELEMENT_TYPE set(final int index, final ELEMENT_TYPE element) {
+		ELEMENT_TYPE oldValue = list.set(index, element);
+		for (IListObserver<ELEMENT_TYPE> observer : registeredObservers) {
 			observer.valueReplaced(this, index, oldValue);
 		}
 		return oldValue;
 	}
 
 	@Override
-	public void add(final int index, final E element) {
+	public void add(final int index, final ELEMENT_TYPE element) {
 		list.add(index, element);
 		modCount++;
-		for (IListObserver<E> observer : registeredObservers) {
+		for (IListObserver<ELEMENT_TYPE> observer : registeredObservers) {
 			observer.valuesAdded(this, index, 1);
 		}
 	}
 
 	@Override
-	public E remove(final int index) {
-		E oldValue = list.remove(index);
+	public ELEMENT_TYPE remove(final int index) {
+		ELEMENT_TYPE oldValue = list.remove(index);
 		modCount++;
-		for (IListObserver<E> observer : registeredObservers) {
+		for (IListObserver<ELEMENT_TYPE> observer : registeredObservers) {
 			observer.valuesRemoved(this, index, Collections.singletonList(oldValue));
 		}
 		return oldValue;
 	}
 
 	@Override
-	public boolean addAll(final Collection<? extends E> c) {
+	public boolean addAll(final Collection<? extends ELEMENT_TYPE> c) {
 		return addAll(size(), c);
 	}
 
 	@Override
-	public boolean addAll(final int index, final Collection<? extends E> c) {
+	public boolean addAll(final int index, final Collection<? extends ELEMENT_TYPE> c) {
 		if (list.addAll(index, c)) {
 			modCount++;
-			for (IListObserver<E> observer : registeredObservers) {
+			for (IListObserver<ELEMENT_TYPE> observer : registeredObservers) {
 				observer.valuesAdded(this, index, c.size());
 			}
 		}
@@ -87,23 +90,32 @@ public class ObservableList<E> extends AbstractList<E> implements IObservableLis
 
 	@Override
 	public void clear() {
-		List<E> dup = new ArrayList<E>(list);
+		List<ELEMENT_TYPE> dup = new ArrayList<ELEMENT_TYPE>(list);
 		list.clear();
 		modCount++;
-		if (!dup.isEmpty()) for (IListObserver<E> observer : registeredObservers) {
+		if (!dup.isEmpty()) for (IListObserver<ELEMENT_TYPE> observer : registeredObservers) {
 			observer.valuesRemoved(this, 0, dup);
 		}
 	}
 
 	@Override
-	public void addObserver(final IListObserver<E> observer) {
+	public void addObserver(final IListObserver<ELEMENT_TYPE> observer) {
 		if (!registeredObservers.contains(observer)) {
 			registeredObservers.add(observer);
 		}
 	}
 
 	@Override
-	public void removeObserver(final IListObserver<E> observer) {
+	public void removeObserver(final IListObserver<ELEMENT_TYPE> observer) {
 		registeredObservers.remove(observer);
+	}
+
+	private static interface IList<E> {
+		E set(final int index, final E element);
+		void add(final int index, final E element);
+		E remove(final int index);
+		boolean addAll(final Collection<? extends E> c);
+		boolean addAll(final int index, final Collection<? extends E> c);
+		void clear();
 	}
 }

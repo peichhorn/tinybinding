@@ -34,27 +34,27 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Reflection {
-	private static final Map<Class<?>, Class<?>> wrapperToPrimitive = new HashMap<Class<?>, Class<?>>();
+	private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPE_MAP = new HashMap<Class<?>, Class<?>>();
 
 	static {
-		wrapperToPrimitive.put(Boolean.class, Boolean.TYPE);
-		wrapperToPrimitive.put(Byte.class, Byte.TYPE);
-		wrapperToPrimitive.put(Character.class, Character.TYPE);
-		wrapperToPrimitive.put(Short.class, Short.TYPE);
-		wrapperToPrimitive.put(Integer.class, Integer.TYPE);
-		wrapperToPrimitive.put(Long.class, Long.TYPE);
-		wrapperToPrimitive.put(Float.class, Float.TYPE);
-		wrapperToPrimitive.put(Double.class, Double.TYPE);
-		wrapperToPrimitive.put(Void.class, Void.TYPE);
+		PRIMITIVE_TYPE_MAP.put(Boolean.class, Boolean.TYPE);
+		PRIMITIVE_TYPE_MAP.put(Byte.class, Byte.TYPE);
+		PRIMITIVE_TYPE_MAP.put(Character.class, Character.TYPE);
+		PRIMITIVE_TYPE_MAP.put(Short.class, Short.TYPE);
+		PRIMITIVE_TYPE_MAP.put(Integer.class, Integer.TYPE);
+		PRIMITIVE_TYPE_MAP.put(Long.class, Long.TYPE);
+		PRIMITIVE_TYPE_MAP.put(Float.class, Float.TYPE);
+		PRIMITIVE_TYPE_MAP.put(Double.class, Double.TYPE);
+		PRIMITIVE_TYPE_MAP.put(Void.class, Void.TYPE);
 	}
 
 	public static <T, S> Class<T> getPrimitive(final Class<S> clazz) {
 		if (clazz == null) return null;
-		return Cast.<Class<T>>uncheckedCast(wrapperToPrimitive.get(clazz));
+		return Cast.<Class<T>>uncheckedCast(PRIMITIVE_TYPE_MAP.get(clazz));
 	}
 
 	public static boolean hasPrimitive(final Class<?> clazz) {
 		if (clazz == null) return false;
-		return wrapperToPrimitive.containsKey(clazz);
+		return PRIMITIVE_TYPE_MAP.containsKey(clazz);
 	}
 }

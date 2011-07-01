@@ -28,12 +28,10 @@ import java.awt.Container;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
-import de.fips.util.tinybinding.ObservableValue;
-
 import lombok.AutoGenMethodStub;
 
 /**
- * {@link ObservableValue} that can wrap the visibility state of a swing component.
+ * {@link de.fips.util.tinybinding.impl.ObservableValue ObservableValue} that can wrap the visibility state of a swing component.
  * <p>
  * <b>Note:</b> All used listeners are added as a {@link java.lang.ref.WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.

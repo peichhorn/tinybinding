@@ -23,10 +23,9 @@ package de.fips.util.tinybinding.pojo;
 
 import lombok.RequiredArgsConstructor;
 import de.fips.util.tinybinding.IObservableValue;
-import de.fips.util.tinybinding.ObservableValue;
 
 /**
- * Creates {@link ObservableValue ObservableValues} for POJOs.
+ * Creates {@link de.fips.util.tinybinding.impl.ObservableValue ObservableValues} for POJOs.
  *
  * @author Philipp Eichhorn
  */
@@ -34,7 +33,7 @@ import de.fips.util.tinybinding.ObservableValue;
 public final class PojoObservable {
 	private final Object pojo;
 
-	public <T> IObservableValue<T> property(final String propertyName, final Class<T> propertyType) {
-		return new PojoObservableValue<T>(pojo, propertyName, propertyType);
+	public <TYPE> IObservableValue<TYPE> property(final String propertyName, final Class<TYPE> propertyType) {
+		return new PojoObservableValue<TYPE>(pojo, propertyName, propertyType);
 	}
 }

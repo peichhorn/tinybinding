@@ -67,6 +67,8 @@ public class DemoLauncher implements Application {
 	}
 
 	public static class LaunchAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
 		private final JComboBox combobox;
 
 		public LaunchAction(final JComboBox combobox) {

@@ -27,10 +27,8 @@ import java.awt.Container;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
-import de.fips.util.tinybinding.ObservableValue;
-
 /**
- * {@link ObservableValue} that can wrap the focus state of a Swing Component.
+ * {@link de.fips.util.tinybinding.impl.ObservableValue ObservableValue} that can wrap the focus state of a Swing Component.
  * <p>
  * <b>Note:</b> All used listeners are added as a {@link java.lang.ref.WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
@@ -43,6 +41,7 @@ class ObservableFocusValue extends ObservableComponentValue<Boolean, Container> 
 	public ObservableFocusValue(final Container component) {
 		super(component);
 		getComponent().addFocusListener(weakListener(FocusListener.class, this).createFor(getComponent()));
+		guardedUpdateValue();
 	}
 
 	@Override

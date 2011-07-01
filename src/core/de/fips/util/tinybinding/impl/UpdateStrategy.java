@@ -19,8 +19,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package de.fips.util.tinybinding;
+package de.fips.util.tinybinding.impl;
 
+import de.fips.util.tinybinding.IConverter;
+import de.fips.util.tinybinding.IObservableValue;
+import de.fips.util.tinybinding.IUpdateStrategy;
+import de.fips.util.tinybinding.IValidationResult;
+import de.fips.util.tinybinding.IValidator;
 import lombok.FluentSetter;
 import lombok.NoArgsConstructor;
 
@@ -31,9 +36,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @FluentSetter
 public class UpdateStrategy<SOURCE_TYPE, TARGET_TYPE> implements IUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> {
-	private IValidator<SOURCE_TYPE> afterGetValidator;
-	private IValidator<TARGET_TYPE> beforeSetValidator;
-	private IConverter<SOURCE_TYPE, TARGET_TYPE> converter = new DefaultConverter<SOURCE_TYPE, TARGET_TYPE>();
+	private IValidator<SOURCE_TYPE> afterGetValidator = new Validator<SOURCE_TYPE>();
+	private IValidator<TARGET_TYPE> beforeSetValidator = new Validator<TARGET_TYPE>();
+	private IConverter<SOURCE_TYPE, TARGET_TYPE> converter = new Converter<SOURCE_TYPE, TARGET_TYPE>();
 
 	public UpdateStrategy(final IValidator<SOURCE_TYPE> afterGetValidator, final IValidator<TARGET_TYPE> beforeSetValidator) {
 		this.afterGetValidator = afterGetValidator;
@@ -46,18 +51,17 @@ public class UpdateStrategy<SOURCE_TYPE, TARGET_TYPE> implements IUpdateStrategy
 	}
 
 	@Override
-	public boolean doSet(final IObservableValue<TARGET_TYPE> value, final TARGET_TYPE object) {
+	public void doSet(final IObservableValue<TARGET_TYPE> value, final TARGET_TYPE object) {
 		value.set(object);
-		return true;
 	}
 
 	@Override
-	public boolean validateAfterGet(final SOURCE_TYPE source) {
-		return (afterGetValidator == null) || afterGetValidator.validate(source);
+	public IValidationResult validateAfterGet(final SOURCE_TYPE source) {
+		return afterGetValidator.validate(source);
 	}
 
 	@Override
-	public boolean validateBeforeSet(final TARGET_TYPE target) {
-		return (beforeSetValidator == null) || beforeSetValidator.validate(target);
+	public IValidationResult validateBeforeSet(final TARGET_TYPE target) {
+		return beforeSetValidator.validate(target);
 	}
 }

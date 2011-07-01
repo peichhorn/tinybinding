@@ -27,5 +27,5 @@ package de.fips.util.tinybinding;
  */
 public interface IValidator<TYPE> {
 
-	public boolean validate(TYPE value);
+	public IValidationResult validate(TYPE value);
 }

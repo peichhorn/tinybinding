@@ -21,6 +21,7 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding.autobind;
 
+import static de.fips.util.tinybinding.Observables.observe;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.List;
@@ -35,10 +36,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.fips.util.tinybinding.DataBindingContext;
 import de.fips.util.tinybinding.ExpectedException;
+import de.fips.util.tinybinding.IBindingContext;
 import de.fips.util.tinybinding.IObservableValue;
-import de.fips.util.tinybinding.ObservableValue;
 import de.fips.util.tinybinding.autobind.AutoBinder;
 import de.fips.util.tinybinding.autobind.Form;
 import de.fips.util.tinybinding.autobind.Model;
@@ -56,7 +56,7 @@ public class AutoBinderTest {
 	private TestModel2 model2;
 	private TestForm form;
 	private TestForm2 form2;
-	private DataBindingContext context;
+	private IBindingContext context;
 
 	@Before
 	public void setUp() {
@@ -134,15 +134,15 @@ public class AutoBinderTest {
 
 	@Model
 	public static class TestModel {
-		public IObservableValue<String> text = ObservableValue.nil();
-		public IObservableValue<Boolean> status = ObservableValue.nil();
+		public IObservableValue<String> text = observe().nil();
+		public IObservableValue<Boolean> status = observe().nil();
 	}
 
 	@Model
 	public static class TestModel2 extends TestModel {
 		public String ignoredField1;
 		public List<String> ignoredField2;
-		public IObservableValue<Double> value = ObservableValue.of(new Double(0.0));
+		public IObservableValue<Double> value = observe().value(new Double(0.0));
 	}
 
 	@Form

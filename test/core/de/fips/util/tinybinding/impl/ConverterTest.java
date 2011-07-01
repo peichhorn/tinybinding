@@ -19,32 +19,35 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package de.fips.util.tinybinding;
+package de.fips.util.tinybinding.impl;
 
 import static org.fest.assertions.Assertions.assertThat;
 
 import org.junit.Rule;
 import org.junit.Test;
 
+import de.fips.util.tinybinding.ExpectedException;
+import de.fips.util.tinybinding.impl.Converter;
+
 /**
- * Tests the {@link DefaultConverter}.
+ * Tests the {@link Converter}.
  *
  * @author Philipp Eichhorn
  */
-public class DefaultConverterTest {
+public class ConverterTest {
 	@Rule
 	public final ExpectedException thrown = ExpectedException.none();
 
 	@Test
 	public void test_convert() {
-		DefaultConverter<Integer, Number> converter = new DefaultConverter<Integer, Number>();
+		Converter<Integer, Number> converter = new Converter<Integer, Number>();
 		Number num = converter.convert(Integer.valueOf(10));
 		assertThat(num).isNotNull();
 	}
 
 	@Test
 	public void test_convert_invalidType() {
-		DefaultConverter<Integer, String> converter = new DefaultConverter<Integer, String>();
+		Converter<Integer, String> converter = new Converter<Integer, String>();
 		thrown.expect(ClassCastException.class);
 		System.out.println(converter.convert(Integer.valueOf(10)));
 	}

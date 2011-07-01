@@ -19,12 +19,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package de.fips.util.tinybinding;
+package de.fips.util.tinybinding.impl;
 
 import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import de.fips.util.tinybinding.IBindingContext;
+import de.fips.util.tinybinding.IConverter;
+import de.fips.util.tinybinding.IObservableValue;
+import de.fips.util.tinybinding.IUpdateStrategy;
+import de.fips.util.tinybinding.IValidationResult;
+import de.fips.util.tinybinding.IValueObserver;
+import de.fips.util.tinybinding.impl.UpdateStrategy;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -34,41 +42,39 @@ import lombok.Setter;
  *
  * @author Philipp Eichhorn
  */
-public final class DataBindingContext {
+public final class BindingContext implements IBindingContext { 
 	private final Map<Pair<?, ?>, Binding<?, ?>> bindings = new HashMap<Pair<?, ?>, Binding<?, ?>>();
 
-	public final <SOURCE_TYPE, TARGET_TYPE> DataBindingContext bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target) {
-		return bind(source, target, new UpdateStrategy<SOURCE_TYPE, TARGET_TYPE>(), new UpdateStrategy<TARGET_TYPE, SOURCE_TYPE>());
+	public <SOURCE_TYPE, TARGET_TYPE> void bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target) {
+		bind(source, target, new UpdateStrategy<SOURCE_TYPE, TARGET_TYPE>(), new UpdateStrategy<TARGET_TYPE, SOURCE_TYPE>());
 	}
 
-	public final <SOURCE_TYPE, TARGET_TYPE> DataBindingContext bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target,
+	public <SOURCE_TYPE, TARGET_TYPE> void bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target,
 			final IConverter<SOURCE_TYPE, TARGET_TYPE> sourceToTarget) {
-		return bind(source, target, new UpdateStrategy<SOURCE_TYPE, TARGET_TYPE>().converter(sourceToTarget), null);
+		bind(source, target, new UpdateStrategy<SOURCE_TYPE, TARGET_TYPE>().converter(sourceToTarget), null);
 	}
 
-	public final <SOURCE_TYPE, TARGET_TYPE> DataBindingContext bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target,
+	public <SOURCE_TYPE, TARGET_TYPE> void bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target,
 			final IConverter<SOURCE_TYPE, TARGET_TYPE> sourceToTarget, final IConverter<TARGET_TYPE, SOURCE_TYPE> targetToSource) {
-		return bind(source, target, new UpdateStrategy<SOURCE_TYPE, TARGET_TYPE>().converter(sourceToTarget), new UpdateStrategy<TARGET_TYPE, SOURCE_TYPE>().converter(targetToSource));
+		bind(source, target, new UpdateStrategy<SOURCE_TYPE, TARGET_TYPE>().converter(sourceToTarget), new UpdateStrategy<TARGET_TYPE, SOURCE_TYPE>().converter(targetToSource));
 	}
 
-	public final <SOURCE_TYPE, TARGET_TYPE> DataBindingContext bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target,
+	public <SOURCE_TYPE, TARGET_TYPE> void bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target,
 			final IUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> sourceToTarget, final IUpdateStrategy<TARGET_TYPE, SOURCE_TYPE> targetToSource) {
-		Binding<SOURCE_TYPE, TARGET_TYPE> binder = new Binding<SOURCE_TYPE, TARGET_TYPE>(source, target, sourceToTarget, targetToSource);
-		bindings.put(Pair.of(source, target), binder);
-		binder.bind();
-		return this;
+		Binding<SOURCE_TYPE, TARGET_TYPE> binding = new Binding<SOURCE_TYPE, TARGET_TYPE>(source, target, sourceToTarget, targetToSource);
+		bindings.put(Pair.of(source, target), binding);
+		binding.bind();
 	}
 
-	public final <SOURCE_TYPE, TARGET_TYPE> DataBindingContext unbind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target) {
+	public <SOURCE_TYPE, TARGET_TYPE> void unbind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target) {
 		Binding<SOURCE_TYPE, TARGET_TYPE> binder = uncheckedCast(bindings.get(Pair.of(source, target)));
 		if (binder != null) {
 			bindings.put(Pair.of(source, target), null);
 			binder.unbind();
 		}
-		return this;
 	}
 
-	public final DataBindingContext unbindAll() {
+	public void unbindAll() {
 		for (Pair<?, ?> key : bindings.keySet()) {
 			Binding<?, ?> binder = bindings.get(key);
 			if (binder != null) {
@@ -76,7 +82,6 @@ public final class DataBindingContext {
 			}
 		}
 		bindings.clear();
-		return this;
 	}
 
 	private static class Binding<SOURCE_TYPE, TARGET_TYPE> {
@@ -116,19 +121,26 @@ public final class DataBindingContext {
 
 		@Override
 		public void valueChanged(final S value, final S oldValue) {
-			target.removeObserver(targetObserver);
-			S s = source.get();
+			final S s = source.get();
 			if (sourceToTarget != null) {
-				if (sourceToTarget.validateAfterGet(s)) {
-					T t = sourceToTarget.convert(s);
-					if (sourceToTarget.validateBeforeSet(t)) {
+				final IValidationResult resultAfterGet = sourceToTarget.validateAfterGet(s);
+				if (isOk(resultAfterGet)) {
+					final T t = sourceToTarget.convert(s);
+					final IValidationResult resultBeforeSet = sourceToTarget.validateBeforeSet(t);
+					if (isOk(resultBeforeSet)) {
+						target.removeObserver(targetObserver);
 						sourceToTarget.doSet(target, t);
+						target.addObserver(targetObserver, false);
 					}
 				}
 			}
-			target.addObserver(targetObserver, false);
+		}
+
+		private boolean isOk(final IValidationResult status) {
+			return IValidationResult.Type.OK.equals(status.getType());
 		}
 	}
+
 	@Data
 	private static class Pair<A, B> {
 		private final A first;

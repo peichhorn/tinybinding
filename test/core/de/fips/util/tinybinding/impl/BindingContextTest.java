@@ -19,7 +19,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package de.fips.util.tinybinding;
+package de.fips.util.tinybinding.impl;
 
 import static de.fips.util.tinybinding.Observables.observe;
 import static org.fest.assertions.Assertions.assertThat;
@@ -30,23 +30,26 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.fips.util.tinybinding.IObservableValue;
+import de.fips.util.tinybinding.impl.UpdateStrategy;
+
 /**
- * Tests the {@link DataBindingContext}.
+ * Tests the {@link BindingContext}.
  *
  * @author Philipp Eichhorn
  */
-public class DataBindingContextTest {
+public class BindingContextTest {
 	private JFrame frame;
 	private IObservableValue<String> gui;
 	private IObservableValue<String> model;
-	private DataBindingContext context;
+	private BindingContext context;
 
 	@Before
 	public void setUp() {
 		frame = new JFrame();
 		gui = observe(frame).title();
-		model = ObservableValue.nil();
-		context = new DataBindingContext();
+		model = observe().nil();
+		context = new BindingContext();
 	}
 
 	@After

@@ -1,5 +1,5 @@
 /*
-Copyright © 2010-2011 Philipp Eichhorn.
+Copyright © 2011 Philipp Eichhorn.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,16 +21,23 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding;
 
-import de.fips.util.tinybinding.util.Cast;
-
 /**
  *
  * @author Philipp Eichhorn
  */
-public final class DefaultConverter<SOURCE_TYPE, TARGET_TYPE> implements IConverter<SOURCE_TYPE, TARGET_TYPE> {
+public interface IBindingContext {
+	public <SOURCE_TYPE, TARGET_TYPE> void bind(IObservableValue<SOURCE_TYPE> source, IObservableValue<TARGET_TYPE> target);
 
-	@Override
-	public final TARGET_TYPE convert(final SOURCE_TYPE source) {
-		return Cast.<TARGET_TYPE>uncheckedCast(source);
-	}
+	public <SOURCE_TYPE, TARGET_TYPE> void bind(IObservableValue<SOURCE_TYPE> source, IObservableValue<TARGET_TYPE> target,
+			IConverter<SOURCE_TYPE, TARGET_TYPE> sourceToTarget);
+
+	public <SOURCE_TYPE, TARGET_TYPE> void bind(IObservableValue<SOURCE_TYPE> source, IObservableValue<TARGET_TYPE> target,
+			IConverter<SOURCE_TYPE, TARGET_TYPE> sourceToTarget, IConverter<TARGET_TYPE, SOURCE_TYPE> targetToSource);
+
+	public <SOURCE_TYPE, TARGET_TYPE> void bind(IObservableValue<SOURCE_TYPE> source, IObservableValue<TARGET_TYPE> target,
+			IUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> sourceToTarget, IUpdateStrategy<TARGET_TYPE, SOURCE_TYPE> targetToSource);
+
+	public <SOURCE_TYPE, TARGET_TYPE> void unbind(IObservableValue<SOURCE_TYPE> source, IObservableValue<TARGET_TYPE> target);
+
+	public void unbindAll();
 }

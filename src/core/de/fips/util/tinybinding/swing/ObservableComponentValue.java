@@ -22,51 +22,50 @@ THE SOFTWARE.
 package de.fips.util.tinybinding.swing;
 
 import java.awt.Container;
-import java.lang.ref.WeakReference;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import de.fips.util.tinybinding.ObservableValue;
+import de.fips.util.tinybinding.impl.ObservableValue;
 
 /**
  * Abstract class that offers its subclasses the basic functionality
  * to synchronize themselves with Swing Component values or states.
  * <p>
- * <b>Note:</b> All used listeners are added as a {@link WeakReference WeakReferences}, so they gets
+ * <b>Note:</b> All used listeners are added as a {@link java.lang.ref.WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
  *
- * @param <T> Type of the observed value.
- * @param <C> Type of the observed Swing Component.
+ * @param <TYPE> Type of the observed value.
+ * @param <COMPONENT_TYPE> Type of the observed Swing Component.
  * @author Philipp Eichhorn
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-abstract class ObservableComponentValue<T, C extends Container> extends ObservableValue<T> {
+abstract class ObservableComponentValue<TYPE, COMPONENT_TYPE extends Container> extends ObservableValue<TYPE> {
 	@NonNull
 	@Getter(AccessLevel.PROTECTED)
-	private final C component;
+	private final COMPONENT_TYPE component;
 	private volatile boolean propertyChange;
 
 	protected final void guardedUpdateValue() {
 		guardedSetValue(getComponentValue());
 	}
 
-	protected final void guardedSetValue(final T value) {
+	protected final void guardedSetValue(final TYPE value) {
 		propertyChange = true;
 		set(value);
 		propertyChange = false;
 	}
 
 
-	protected abstract T getComponentValue();
+	protected abstract TYPE getComponentValue();
 
 	@Override
-	protected final void doSet(final T value){
+	protected final void doSet(final TYPE value) {
 		if (!propertyChange) {
 			guardedDoSet(value);
 		}
 	}
 
-	protected abstract void guardedDoSet(final T value);
+	protected abstract void guardedDoSet(final TYPE value);
 }

@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
  *
  * @author Philipp Eichhorn
  */
-@NoArgsConstructor(access=AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Version {
 	private static final String VERSION = "1.0.3-HEAD";
 

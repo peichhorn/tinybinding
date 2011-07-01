@@ -31,7 +31,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 
-import de.fips.util.tinybinding.DataBindingContext;
+import de.fips.util.tinybinding.BindingContexts;
+import de.fips.util.tinybinding.IBindingContext;
 import de.fips.util.tinybinding.IObservableValue;
 
 import lombok.AccessLevel;
@@ -67,22 +68,22 @@ import lombok.NoArgsConstructor;
  *
  * @author Philipp Eichhorn
  */
-@NoArgsConstructor(access=AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AutoBinder {
 	/**
 	 * Binds the model and form objects.
 	 *
 	 * @param modelObject
 	 * @param formObject
-	 * @return The {@link DataBindingContext} used for the auto-bind.
+	 * @return The {@link BindingContext} used for the auto-bind.
 	 * @throws IllegalArgumentException
 	 * @throws NoSuchFieldException
 	 */
-	public static DataBindingContext bind(final Object modelObject, final Object formObject) throws NoSuchFieldException {
+	public static IBindingContext bind(final Object modelObject, final Object formObject) throws NoSuchFieldException {
 		final Class<?> modelClass = getAnnotatedClass(modelObject, "modelObject", Model.class);
 		final Class<?> formClass = getAnnotatedClass(formObject, "formObject", Form.class);
 
-		final DataBindingContext context = new DataBindingContext();
+		final IBindingContext context = BindingContexts.defaultContext();
 		for (final Field modelField : modelClass.getFields()) {
 			final Class<?> observedModelClass = getObservedClass(modelField);
 			if (observedModelClass == null) continue; // as we care for nothing else
@@ -106,7 +107,7 @@ public final class AutoBinder {
 		}
 		return context;
 	}
-	private static void doBind(final DataBindingContext context, final Class<?> observedModelClass, final Container element, final IObservableValue<?> value) {
+	private static void doBind(final IBindingContext context, final Class<?> observedModelClass, final Container element, final IObservableValue<?> value) {
 		if (String.class == observedModelClass) {
 			final IObservableValue<String> stringValue = uncheckedCast(value);
 			context.bind(stringValue, observe(element).text());

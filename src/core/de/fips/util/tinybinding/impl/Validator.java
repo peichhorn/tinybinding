@@ -19,24 +19,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package de.fips.util.tinybinding.weaklistener;
+package de.fips.util.tinybinding.impl;
 
-import lombok.RequiredArgsConstructor;
+import static de.fips.util.tinybinding.ValidationResults.ok;
+import de.fips.util.tinybinding.IValidationResult;
+import de.fips.util.tinybinding.IValidator;
 
-@RequiredArgsConstructor
-public final class WeakListenerWithType<S, T extends S> {
-	private final Class<S> listenerType;
-	private final T listener;
+/**
+ *
+ * @author Philipp Eichhorn
+ */
+public class Validator<TYPE> implements IValidator<TYPE> {
 
-	public WeakListenerTypeAndTarget<S, T> withTarget(final Object target) {
-		return new WeakListenerTypeAndTarget<S, T>(listenerType, listener, target);
-	}
-
-	public S addTo(final Object target) {
-		return withTarget(target).add();
-	}
-
-	public S createFor(final Object target) {
-		return withTarget(target).get();
+	@Override
+	public IValidationResult validate(final TYPE value) {
+		return ok();
 	}
 }

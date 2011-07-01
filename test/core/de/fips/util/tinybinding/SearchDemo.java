@@ -44,6 +44,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import de.fips.util.tinybinding.impl.ObservableValue;
+
 import lombok.AccessLevel;
 import lombok.Application;
 import lombok.Getter;
@@ -103,7 +105,7 @@ public class SearchDemo implements Application {
 			SearchDemoView view = new SearchDemoView(action, model);
 
 			AggregatedBoolean aggregatedValue = new AggregatedBoolean();
-			DataBindingContext context = new DataBindingContext();
+			IBindingContext context = BindingContexts.defaultContext();
 			context.bind(view.searchText, aggregatedValue.add(), StringLengthToBooleanConverter.notEmpty());
 			context.bind(view.comboValue, aggregatedValue.add(), ValueToBooleanConverter.isTrue("Google"));
 			context.bind(aggregatedValue, view.enabledValue);
@@ -116,7 +118,7 @@ public class SearchDemo implements Application {
 		private static final long serialVersionUID = -8331751772675716791L;
 
 		@Getter
-		private final IObservableValue<String> searchText = ObservableValue.of("");
+		private final IObservableValue<String> searchText = observe().value("");
 
 		public SearchAction() {
 			super("Search");

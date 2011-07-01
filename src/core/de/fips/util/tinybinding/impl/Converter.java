@@ -19,19 +19,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package de.fips.util.tinybinding.util;
+package de.fips.util.tinybinding.impl;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import de.fips.util.tinybinding.IConverter;
+import de.fips.util.tinybinding.util.Cast;
 
 /**
  *
  * @author Philipp Eichhorn
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Cast {
-	@SuppressWarnings("unchecked")
-	public static <T> T uncheckedCast(final Object value) {
-		return (T) value;
+public final class Converter<SOURCE_TYPE, TARGET_TYPE> implements IConverter<SOURCE_TYPE, TARGET_TYPE> {
+
+	@Override
+	public final TARGET_TYPE convert(final SOURCE_TYPE source) {
+		return Cast.<TARGET_TYPE>uncheckedCast(source);
 	}
 }

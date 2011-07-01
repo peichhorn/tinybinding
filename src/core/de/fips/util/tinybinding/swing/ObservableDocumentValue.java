@@ -32,10 +32,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
-import de.fips.util.tinybinding.ObservableValue;
-
 /**
- * {@link ObservableValue} that can wrap the document text of a {@link JTextComponent}.
+ * {@link de.fips.util.tinybinding.impl.ObservableValue ObservableValue} that can wrap the document text of a {@link JTextComponent}.
  * <p>
  * <b>Note:</b> All used listeners are added as a {@link java.lang.ref.WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.

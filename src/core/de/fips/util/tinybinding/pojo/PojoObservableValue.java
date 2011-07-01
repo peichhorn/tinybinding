@@ -34,8 +34,8 @@ import java.beans.PropertyChangeListener;
 import org.fest.reflect.beanproperty.Invoker;
 import org.fest.reflect.exception.ReflectionError;
 
-import de.fips.util.tinybinding.ObservableValue;
 import de.fips.util.tinybinding.WeakReferences;
+import de.fips.util.tinybinding.impl.ObservableValue;
 import de.fips.util.tinybinding.util.Cast;
 
 /**
@@ -49,17 +49,17 @@ import de.fips.util.tinybinding.util.Cast;
  * <b>Note:</b> The {@link PropertyChangeListener} is added as a {@link java.lang.ref.WeakReference WeakReference},
  * so it gets garbage collected when the time comes.
  *
- * @param <T> Type of the observed POJO field
+ * @param <TYPE> Type of the observed POJO field
  * @see WeakReferences
  * @author Philipp Eichhorn
  */
-class PojoObservableValue<T> extends ObservableValue<T> implements PropertyChangeListener {
+class PojoObservableValue<TYPE> extends ObservableValue<TYPE> implements PropertyChangeListener {
 	private final Object pojo;
 	private final String propertyName;
-	private final Class<T> propertyType;
+	private final Class<TYPE> propertyType;
 	private volatile boolean propertyChange;
 
-	PojoObservableValue(final Object pojo, final String propertyName, final Class<T> propertyType) {
+	PojoObservableValue(final Object pojo, final String propertyName, final Class<TYPE> propertyType) {
 		this.pojo = pojo;
 		this.propertyName = propertyName;
 		this.propertyType = propertyType;
@@ -74,16 +74,16 @@ class PojoObservableValue<T> extends ObservableValue<T> implements PropertyChang
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
-		guardedSetValue(Cast.<T>uncheckedCast(event.getNewValue()));
+		guardedSetValue(Cast.<TYPE>uncheckedCast(event.getNewValue()));
 	}
 
-	protected void guardedSetValue(final T value) {
+	protected void guardedSetValue(final TYPE value) {
 		propertyChange = true;
 		set(value);
 		propertyChange = false;
 	}
 
-	protected T getPojoValue() {
+	protected TYPE getPojoValue() {
 		try {
 			return getInvoker().get();
 		} catch (ReflectionError ignore) {
@@ -92,7 +92,7 @@ class PojoObservableValue<T> extends ObservableValue<T> implements PropertyChang
 	}
 
 	@Override
-	protected void doSet(final T value) {
+	protected void doSet(final TYPE value) {
 		if (!propertyChange) {
 			try {
 				getInvoker().set(value);
@@ -102,12 +102,12 @@ class PojoObservableValue<T> extends ObservableValue<T> implements PropertyChang
 		}
 	}
 
-	private Invoker<T> getInvoker() {
+	private Invoker<TYPE> getInvoker() {
 		try {
 			return property(propertyName).ofType(propertyType).in(pojo);
 		} catch (ReflectionError e) {
 			if (hasPrimitive(propertyType)) {
-				final Invoker<T> invoker = uncheckedCast(property(propertyName).ofType(getPrimitive(propertyType)).in(pojo));
+				final Invoker<TYPE> invoker = uncheckedCast(property(propertyName).ofType(getPrimitive(propertyType)).in(pojo));
 				return invoker;
 			} else throw e;
 		}

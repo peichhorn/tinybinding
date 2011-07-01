@@ -21,6 +21,7 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding;
 
+import static de.fips.util.tinybinding.Observables.observe;
 import static javax.swing.JOptionPane.*;
 import static lombok.With.with;
 
@@ -66,6 +67,8 @@ public class SimpleDemo implements Application {
 	}
 
 	public static class LoginAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
 		private final LoginModel model;
 
 		public LoginAction(final LoginModel model) {
@@ -108,8 +111,8 @@ public class SimpleDemo implements Application {
 
 	@Model
 	public static class LoginModel {
-		public IObservableValue<String> loginName = ObservableValue.of("");
-		public IObservableValue<String> password = ObservableValue.of("");
-		public IObservableValue<Boolean> autologin = ObservableValue.of(Boolean.FALSE);
+		public IObservableValue<String> loginName = observe().value("");
+		public IObservableValue<String> password = observe().value("");
+		public IObservableValue<Boolean> autologin = observe().value(Boolean.FALSE);
 	}
 }

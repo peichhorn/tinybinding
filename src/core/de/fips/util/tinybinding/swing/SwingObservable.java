@@ -21,8 +21,6 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding.swing;
 
-import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Rectangle;
@@ -32,11 +30,11 @@ import javax.swing.JList;
 import javax.swing.text.JTextComponent;
 
 import lombok.RequiredArgsConstructor;
+import lombok.core.util.Cast;
 import de.fips.util.tinybinding.IObservableValue;
-import de.fips.util.tinybinding.ObservableValue;
 
 /**
- * Creates {@link ObservableValue} for Swing Components.
+ * Creates {@link de.fips.util.tinybinding.impl.ObservableValue ObservableValue} for Swing Components.
  *
  * @author Philipp Eichhorn
  */
@@ -88,15 +86,18 @@ public final class SwingObservable {
 		return new ObservablePropertyValue<String>("ToolTipText", String.class, source);
 	}
 
-	public <T> IObservableValue<T> value() {
+	public <TYPE> IObservableValue<TYPE> value() {
 		if (source instanceof JComboBox) {
-			return new ObservableComboBoxValue<T>((JComboBox) source);
+			return new ObservableComboBoxValue<TYPE>((JComboBox) source);
 		} else if (source instanceof JList) {
-			return new ObservableListValue<T>((JList) source);
+			return new ObservableListValue<TYPE>((JList) source);
 		} else {
-			Class<T> clazz = uncheckedCast(Object.class);
-			return new ObservablePropertyValue<T>("value", clazz, source);
+			return Cast.<IObservableValue<TYPE>>uncheckedCast(new ObservablePropertyValue<Object>("value", Object.class, source));
 		}
+	}
+
+	public <TYPE> IObservableValue<TYPE> value(final Class<TYPE> type) {
+		return value();
 	}
 
 	public IObservableValue<Boolean> visible() {

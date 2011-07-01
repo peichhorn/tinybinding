@@ -19,24 +19,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package de.fips.util.tinybinding.weaklistener;
+package de.fips.util.tinybinding;
 
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
-public final class WeakListenerWithType<S, T extends S> {
-	private final Class<S> listenerType;
-	private final T listener;
-
-	public WeakListenerTypeAndTarget<S, T> withTarget(final Object target) {
-		return new WeakListenerTypeAndTarget<S, T>(listenerType, listener, target);
+public interface IValidationResult {
+	public static enum Type {
+		OK,
+		WARNING,
+		ERROR;
 	}
 
-	public S addTo(final Object target) {
-		return withTarget(target).add();
-	}
-
-	public S createFor(final Object target) {
-		return withTarget(target).get();
-	}
+	public Type getType();
+	
+	public String getMessage();
 }

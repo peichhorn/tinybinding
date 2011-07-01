@@ -23,6 +23,7 @@ package de.fips.util.tinybinding;
 
 import java.awt.Container;
 
+import de.fips.util.tinybinding.impl.Observable;
 import de.fips.util.tinybinding.pojo.PojoObservable;
 import de.fips.util.tinybinding.swing.SwingObservable;
 import lombok.AccessLevel;
@@ -34,11 +35,16 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Observables {
+
 	public static SwingObservable observe(final Container source) {
 		return new SwingObservable(source);
 	}
 
 	public static PojoObservable observe(final Object pojo) {
 		return new PojoObservable(pojo);
+	}
+
+	public static Observable observe() {
+		return new Observable();
 	}
 }

@@ -19,8 +19,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package de.fips.util.tinybinding;
+package de.fips.util.tinybinding.impl;
 
+import static de.fips.util.tinybinding.ValidationResultCondition.*;
 import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Matchers.*;
@@ -29,6 +30,12 @@ import static org.mockito.Mockito.*;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import de.fips.util.tinybinding.ExpectedException;
+import de.fips.util.tinybinding.IConverter;
+import de.fips.util.tinybinding.IObservableValue;
+import de.fips.util.tinybinding.IValidator;
+import de.fips.util.tinybinding.ValidationResults;
 
 /**
  * Tests the {@link UpdateStrategy}.
@@ -78,18 +85,20 @@ public class UpdateStrategyTest {
 
 	@Test
 	public void test_validateAfterGetOnlyCallsAfterGetValidator() {
-		doReturn(true).when(afterGetValidator).validate(eq(Integer.valueOf(10)));
-		assertThat(updateStrategy.validateAfterGet(Integer.valueOf(10))).isTrue();
-		assertThat(updateStrategy.validateAfterGet(Integer.valueOf(20))).isFalse();
+		doReturn(ValidationResults.ok()).when(afterGetValidator).validate(eq(Integer.valueOf(10)));
+		doReturn(ValidationResults.warning("< 20")).when(afterGetValidator).validate(eq(Integer.valueOf(20)));
+		assertThat(updateStrategy.validateAfterGet(Integer.valueOf(10))).is(ok());
+		assertThat(updateStrategy.validateAfterGet(Integer.valueOf(20))).is(warning());
 		verify(afterGetValidator, times(2)).validate(any(Integer.class));
 		verifyZeroInteractions(beforeSetValidator, converter);
 	}
 
 	@Test
 	public void test_validateBeforeSetOnlyCallsBeforeSetValidator() {
-		doReturn(true).when(beforeSetValidator).validate(eq("Hello"));
-		assertThat(updateStrategy.validateBeforeSet("Hello")).isTrue();
-		assertThat(updateStrategy.validateBeforeSet("You")).isFalse();
+		doReturn(ValidationResults.ok()).when(beforeSetValidator).validate(eq("Hello"));
+		doReturn(ValidationResults.error("not 'You'")).when(beforeSetValidator).validate(eq("You"));
+		assertThat(updateStrategy.validateBeforeSet("Hello")).is(ok());
+		assertThat(updateStrategy.validateBeforeSet("You")).is(error());
 		verify(beforeSetValidator, times(2)).validate(any(String.class));
 		verifyZeroInteractions(afterGetValidator, converter);
 	}

@@ -1,5 +1,5 @@
 /*
-Copyright © 2010-2011 Philipp Eichhorn.
+Copyright © 2011 Philipp Eichhorn.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,24 +19,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package de.fips.util.tinybinding.weaklistener;
+package de.fips.util.tinybinding.impl;
 
+import de.fips.util.tinybinding.IValidationResult;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class WeakListenerWithType<S, T extends S> {
-	private final Class<S> listenerType;
-	private final T listener;
-
-	public WeakListenerTypeAndTarget<S, T> withTarget(final Object target) {
-		return new WeakListenerTypeAndTarget<S, T>(listenerType, listener, target);
-	}
-
-	public S addTo(final Object target) {
-		return withTarget(target).add();
-	}
-
-	public S createFor(final Object target) {
-		return withTarget(target).get();
-	}
+@Getter
+public final class ValidationResult implements IValidationResult {
+	private final Type type;
+	private final String message;
 }

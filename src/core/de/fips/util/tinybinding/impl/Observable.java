@@ -19,24 +19,38 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package de.fips.util.tinybinding.weaklistener;
+package de.fips.util.tinybinding.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import de.fips.util.tinybinding.IObservableList;
+import de.fips.util.tinybinding.IObservableMap;
+import de.fips.util.tinybinding.IObservableValue;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Creates new {@link ObservableValue ObservableValues}, {@link ObservableMap ObservableMaps} and
+ * {@link ObservableList ObservableLists} for just about anything.
+ *
+ * @author Philipp Eichhorn
+ */
 @RequiredArgsConstructor
-public final class WeakListenerWithType<S, T extends S> {
-	private final Class<S> listenerType;
-	private final T listener;
-
-	public WeakListenerTypeAndTarget<S, T> withTarget(final Object target) {
-		return new WeakListenerTypeAndTarget<S, T>(listenerType, listener, target);
+public class Observable {
+	public <KEY_TYPE, VALUE_TYPE> IObservableMap<KEY_TYPE, VALUE_TYPE> map(final Map<KEY_TYPE, VALUE_TYPE> map) {
+		return new ObservableMap<KEY_TYPE, VALUE_TYPE>(map);
 	}
 
-	public S addTo(final Object target) {
-		return withTarget(target).add();
+	public <ELEMENT_TYPE> IObservableList<ELEMENT_TYPE> list(final List<ELEMENT_TYPE> list) {
+		return new ObservableList<ELEMENT_TYPE>(list);
 	}
-
-	public S createFor(final Object target) {
-		return withTarget(target).get();
+	
+	public <TYPE> IObservableValue<TYPE> value(final TYPE value) {
+		return new ObservableValue<TYPE>(value);
+	}
+	
+	public <TYPE> IObservableValue<TYPE> nil() {
+		return new ObservableValue<TYPE>();
 	}
 }

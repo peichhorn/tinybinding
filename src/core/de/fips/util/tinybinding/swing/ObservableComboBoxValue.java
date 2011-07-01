@@ -30,21 +30,20 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JComboBox;
 
-import de.fips.util.tinybinding.ObservableValue;
 import de.fips.util.tinybinding.util.Cast;
 
 /**
- * {@link ObservableValue} that can wrap the value selection of a {@link JComboBox}.
+ * {@link de.fips.util.tinybinding.impl.ObservableValue ObservableValue} that can wrap the value selection of a {@link JComboBox}.
  * <p>
  * <b>Note:</b> All used listeners are added as a {@link java.lang.ref.WeakReference WeakReferences}, so they gets
  * garbage collected when the time comes.
  *
  * @see ActionListener
  * @see PropertyChangeListener
- * @param <T> Type of the observed combobox value.
+ * @param <TYPE> Type of the observed combobox value.
  * @author Philipp Eichhorn
  */
-class ObservableComboBoxValue<T> extends ObservableComponentValue<T, JComboBox> implements ActionListener, PropertyChangeListener {
+class ObservableComboBoxValue<TYPE> extends ObservableComponentValue<TYPE, JComboBox> implements ActionListener, PropertyChangeListener {
 
 	public ObservableComboBoxValue(final JComboBox component) {
 		super(component);
@@ -64,12 +63,12 @@ class ObservableComboBoxValue<T> extends ObservableComponentValue<T, JComboBox> 
 	}
 
 	@Override
-	protected void guardedDoSet(final T value) {
+	protected void guardedDoSet(final TYPE value) {
 		getComponent().setSelectedItem(value);
 	}
 
 	@Override
-	public T getComponentValue() {
-		return Cast.<T>uncheckedCast(getComponent().getSelectedItem());
+	public TYPE getComponentValue() {
+		return Cast.<TYPE>uncheckedCast(getComponent().getSelectedItem());
 	}
 }

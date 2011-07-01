@@ -19,10 +19,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package de.fips.util.tinybinding;
+package de.fips.util.tinybinding.impl;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import de.fips.util.tinybinding.IObservableValue;
+import de.fips.util.tinybinding.IValueObserver;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -32,8 +35,8 @@ import lombok.ToString;
  *
  * @author Philipp Eichhorn
  */
-@ToString(of="value")
-@NoArgsConstructor(access=AccessLevel.PROTECTED)
+@ToString(of = "value")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ObservableValue<TYPE> implements IObservableValue<TYPE> {
 	private TYPE value;
 	private final List<IValueObserver<TYPE>> registeredObservers = new CopyOnWriteArrayList<IValueObserver<TYPE>>();
@@ -91,13 +94,5 @@ public class ObservableValue<TYPE> implements IObservableValue<TYPE> {
 	@Override
 	public final void removeObserver(final IValueObserver<TYPE> observer) {
 		registeredObservers.remove(observer);
-	}
-
-	public static <TYPE> ObservableValue<TYPE> of(final TYPE value) {
-		return new ObservableValue<TYPE>(value);
-	}
-
-	public static <TYPE> ObservableValue<TYPE> nil() {
-		return new ObservableValue<TYPE>();
 	}
 }
