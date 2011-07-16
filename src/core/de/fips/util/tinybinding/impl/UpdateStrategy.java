@@ -21,11 +21,14 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding.impl;
 
+import static de.fips.util.tinybinding.ValidationResults.ok;
+
 import de.fips.util.tinybinding.IConverter;
 import de.fips.util.tinybinding.IObservableValue;
 import de.fips.util.tinybinding.IUpdateStrategy;
 import de.fips.util.tinybinding.IValidationResult;
 import de.fips.util.tinybinding.IValidator;
+
 import lombok.FluentSetter;
 import lombok.NoArgsConstructor;
 
@@ -36,8 +39,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @FluentSetter
 public class UpdateStrategy<SOURCE_TYPE, TARGET_TYPE> implements IUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> {
-	private IValidator<SOURCE_TYPE> afterGetValidator = new Validator<SOURCE_TYPE>();
-	private IValidator<TARGET_TYPE> beforeSetValidator = new Validator<TARGET_TYPE>();
+	private IValidator<SOURCE_TYPE> afterGetValidator;
+	private IValidator<TARGET_TYPE> beforeSetValidator;
 	private IConverter<SOURCE_TYPE, TARGET_TYPE> converter = new Converter<SOURCE_TYPE, TARGET_TYPE>();
 
 	public UpdateStrategy(final IValidator<SOURCE_TYPE> afterGetValidator, final IValidator<TARGET_TYPE> beforeSetValidator) {
@@ -57,11 +60,11 @@ public class UpdateStrategy<SOURCE_TYPE, TARGET_TYPE> implements IUpdateStrategy
 
 	@Override
 	public IValidationResult validateAfterGet(final SOURCE_TYPE source) {
-		return afterGetValidator.validate(source);
+		return (afterGetValidator == null) ? ok() : afterGetValidator.validate(source);
 	}
 
 	@Override
 	public IValidationResult validateBeforeSet(final TARGET_TYPE target) {
-		return beforeSetValidator.validate(target);
+		return (beforeSetValidator == null) ? ok() : beforeSetValidator.validate(target);
 	}
 }
