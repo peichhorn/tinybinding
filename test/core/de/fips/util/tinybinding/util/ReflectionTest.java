@@ -31,14 +31,14 @@ public class ReflectionTest {
 	public void test_getPrimitiveReturnsNullOnNull() {
 		assertNull(Reflection.getPrimitive(null));
 	}
-	
+
 	@Test
 	public void test_hasPrimitiveReturnsFalseOnNull() {
 		assertFalse(Reflection.hasPrimitive(null));
 	}
-	
+
 	@Test
-	public void test_getPrimitive() {	
+	public void test_getPrimitive() {
 		assertEquals(Boolean.TYPE, Reflection.getPrimitive(Boolean.class));
 		assertEquals(Byte.TYPE, Reflection.getPrimitive(Byte.class));
 		assertEquals(Character.TYPE, Reflection.getPrimitive(Character.class));

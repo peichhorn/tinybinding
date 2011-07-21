@@ -64,7 +64,7 @@ public class PojoObservablesTest {
 		text.set("42");
 		assertThat(pojo1.getText()).isEqualTo("42");
 	}
-	
+
 	@Test
 	public void test_observeValue_primitive() {
 		IObservableValue<Boolean> bool = observe(pojo1).property("bool", Boolean.class);

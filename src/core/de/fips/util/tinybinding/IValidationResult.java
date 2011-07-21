@@ -29,6 +29,6 @@ public interface IValidationResult {
 	}
 
 	public Type getType();
-	
+
 	public String getMessage();
 }

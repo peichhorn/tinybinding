@@ -33,7 +33,7 @@ import org.junit.rules.ExpectedException;
 public class CastTest {
 	@Rule
 	public final ExpectedException thrown = ExpectedException.none();
-	
+
 	@Test
 	public void test_validUncheckedCast() {
 		@SuppressWarnings("rawtypes")
@@ -41,7 +41,7 @@ public class CastTest {
 		List<String> stringList = Cast.uncheckedCast(list);
 		assertFalse(stringList.isEmpty());
 	}
-	
+
 	@Test
 	public void test_invalidUncheckedCast() {
 		thrown.expect(ClassCastException.class);

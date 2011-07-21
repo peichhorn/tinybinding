@@ -45,7 +45,7 @@ import de.fips.util.tinybinding.ValidationResults;
 public class UpdateStrategyTest {
 	@Rule
 	public final ExpectedException thrown = ExpectedException.none();
-	
+
 	private UpdateStrategy<Integer, String> updateStrategy;
 	private IValidator<Integer> afterGetValidator;
 	private IValidator<String> beforeSetValidator;
@@ -67,14 +67,14 @@ public class UpdateStrategyTest {
 		verify(converter, times(1)).convert(eq(Integer.valueOf(10)));
 		verifyZeroInteractions(beforeSetValidator, afterGetValidator);
 	}
-	
+
 	@Test
 	public void test_convertDoesNotCatchExceptionComingFromConverter() {
 		doThrow(new ClassCastException()).when(converter).convert(any(Integer.class));
 		thrown.expect(ClassCastException.class);
 		updateStrategy.convert(Integer.valueOf(10));
 	}
-	
+
 	@Test
 	public void test_doSetOnlyCallsSetOnValue() {
 		IObservableValue<String> value = uncheckedCast(mock(IObservableValue.class));

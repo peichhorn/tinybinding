@@ -31,6 +31,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 
+import de.fips.util.tinybinding.Bindings;
 import de.fips.util.tinybinding.BindingContexts;
 import de.fips.util.tinybinding.IBindingContext;
 import de.fips.util.tinybinding.IObservableValue;
@@ -110,12 +111,12 @@ public final class AutoBinder {
 	private static void doBind(final IBindingContext context, final Class<?> observedModelClass, final Container element, final IObservableValue<?> value) {
 		if (String.class == observedModelClass) {
 			final IObservableValue<String> stringValue = uncheckedCast(value);
-			context.bind(stringValue, observe(element).text());
+			Bindings.bind(stringValue).to(observe(element).text()).in(context);
 		} else if (Boolean.class == observedModelClass) {
 			final IObservableValue<Boolean> booleanValue = uncheckedCast(value);
-			context.bind(booleanValue, observe(element).selected());
+			Bindings.bind(booleanValue).to(observe(element).selected()).in(context);
 		} else {
-			context.bind(value, observe(element).value());
+			Bindings.bind(value).to(observe(element).value()).in(context);
 		}
 	}
 

@@ -21,8 +21,9 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding;
 
-import static lombok.With.with;
+import static de.fips.util.tinybinding.Bindings.bind;
 import static de.fips.util.tinybinding.Observables.observe;
+import static lombok.With.with;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;
@@ -46,11 +47,9 @@ import javax.swing.JTextField;
 
 import de.fips.util.tinybinding.impl.ObservableValue;
 
-import lombok.AccessLevel;
 import lombok.Application;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.SwingInvokeLater;
 
 public class SearchDemo implements Application {
@@ -105,11 +104,10 @@ public class SearchDemo implements Application {
 			SearchDemoView view = new SearchDemoView(action, model);
 
 			AggregatedBoolean aggregatedValue = new AggregatedBoolean();
-			IBindingContext context = BindingContexts.defaultContext();
-			context.bind(view.searchText, aggregatedValue.add(), StringLengthToBooleanConverter.notEmpty());
-			context.bind(view.comboValue, aggregatedValue.add(), ValueToBooleanConverter.isTrue("Google"));
-			context.bind(aggregatedValue, view.enabledValue);
-			context.bind(view.searchText, action.getSearchText());
+			bind(view.searchText).to(aggregatedValue.add()).sourceConverter(notEmpty()).go();
+			bind(view.comboValue).to(aggregatedValue.add()).sourceConverter(isTrue("Google")).go();
+			bind(aggregatedValue).to(view.enabledValue).go();
+			bind(view.searchText).to(action.getSearchText()).go();
 			return view;
 		}
 	}
@@ -139,35 +137,22 @@ public class SearchDemo implements Application {
 		}
 	}
 
-	@RequiredArgsConstructor(access=AccessLevel.PRIVATE)
-	public static class StringLengthToBooleanConverter implements IConverter<String, Boolean> {
-		private final int minimalLength;
-
-		@Override
-		public Boolean convert(final String value) {
-			return (value != null) && (value.length() >= minimalLength);
-		}
-
-		public static IConverter<String, Boolean> notEmpty() {
-			return new StringLengthToBooleanConverter(1);
-		}
-
-		public static StringLengthToBooleanConverter atLeast(final int minimalLength) {
-			return new StringLengthToBooleanConverter(minimalLength);
-		}
+	public static IConverter<String, Boolean> notEmpty() {
+		return new IConverter<String, Boolean>() {
+			@Override
+			public Boolean convert(final String value) {
+				return (value != null) && (!value.isEmpty());
+			}
+		};
 	}
 
-	@RequiredArgsConstructor(access=AccessLevel.PRIVATE)
-	public static class ValueToBooleanConverter<T> implements IConverter<T, Boolean> {
-		private final T trueValue;
-		@Override
-		public Boolean convert(final T source) {
-			return trueValue.equals(source);
-		}
-
-		public static <T> ValueToBooleanConverter<T> isTrue(final T trueValue) {
-			return new ValueToBooleanConverter<T>(trueValue);
-		}
+	public static <T> IConverter<T, Boolean> isTrue(final T trueValue) {
+		return new IConverter<T, Boolean>() {
+			@Override
+			public Boolean convert(final T source) {
+				return trueValue.equals(source);
+			}
+		};
 	}
 
 	@NoArgsConstructor

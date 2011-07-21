@@ -16,7 +16,7 @@ public class ValidationResultCondition extends Condition<Object> {
 		}
 		return false;
 	}
-	
+
 	public static Condition<Object> ok() {
 		return new ValidationResultCondition(IValidationResult.Type.OK);
 	}
@@ -24,7 +24,7 @@ public class ValidationResultCondition extends Condition<Object> {
 	public static Condition<Object> warning() {
 		return new ValidationResultCondition(IValidationResult.Type.WARNING);
 	}
-	
+
 	public static Condition<Object> error() {
 		return new ValidationResultCondition(IValidationResult.Type.ERROR);
 	}

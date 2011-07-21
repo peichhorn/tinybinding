@@ -285,7 +285,7 @@ public class SwingObservableTest extends ComponentTestFixture {
 		getRobot().waitForIdle();
 		verify(observer, times(1)).valueChanged(eq(Long.valueOf(10)), any(Long.class));
 	}
-	
+
 	@Test
 	public void test_observeValue_List() {
 		IObservableValue<String> value = observe(list).value();

@@ -15,6 +15,7 @@ public class ExpectedException implements MethodRule {
 	private ExpectedException() {
 	}
 
+	@Override
 	public Statement apply(Statement base, FrameworkMethod method, Object target) {
 		return delegate.apply(base, method, target);
 	}

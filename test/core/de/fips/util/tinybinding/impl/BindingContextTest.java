@@ -21,6 +21,7 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding.impl;
 
+import static de.fips.util.tinybinding.Bindings.bind;
 import static de.fips.util.tinybinding.Observables.observe;
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -30,8 +31,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.fips.util.tinybinding.IBindingContext;
 import de.fips.util.tinybinding.IObservableValue;
-import de.fips.util.tinybinding.impl.UpdateStrategy;
 
 /**
  * Tests the {@link BindingContext}.
@@ -42,7 +43,7 @@ public class BindingContextTest {
 	private JFrame frame;
 	private IObservableValue<String> gui;
 	private IObservableValue<String> model;
-	private BindingContext context;
+	private IBindingContext context;
 
 	@Before
 	public void setUp() {
@@ -64,7 +65,7 @@ public class BindingContextTest {
 	public void test_bind_autoUpdate() {
 		assertThat(model.get()).isNull();
 		assertThat(gui.get()).isNotNull();
-		context.bind(gui, model);
+		bind(gui).to(model).in(context);
 		assertThat(model.get()).isNotNull().isEqualTo(gui.get());
 		frame.setTitle("Good Title");
 		assertThat(gui.get()).isEqualTo("Good Title");
@@ -81,7 +82,7 @@ public class BindingContextTest {
 	public void test_bind_customUpdate() {
 		assertThat(model.get()).isNull();
 		assertThat(gui.get()).isNotNull();
-		context.bind(gui, model, new UpdateStrategy<String, String>(), null);
+		bind(gui).to(model).updateTarget().in(context);
 		assertThat(model.get()).isNotNull().isEqualTo(gui.get());
 		frame.setTitle("Good Title");
 		assertThat(gui.get()).isEqualTo("Good Title");

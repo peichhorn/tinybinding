@@ -16,7 +16,7 @@ public class ObservablesTest {
 	public void test_observeContainerCreatesSwingObservable() {
 		assertThat(observe(mock(Container.class))).isInstanceOf(SwingObservable.class);
 	}
-	
+
 	@Test
 	public void test_observeObjectCreatesPojoObservable() {
 		assertThat(observe(mock(Object.class))).isInstanceOf(PojoObservable.class);

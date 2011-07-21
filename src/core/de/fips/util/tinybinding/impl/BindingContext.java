@@ -27,13 +27,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.fips.util.tinybinding.IBindingContext;
-import de.fips.util.tinybinding.IConverter;
 import de.fips.util.tinybinding.IObservableValue;
 import de.fips.util.tinybinding.IUpdateStrategy;
 import de.fips.util.tinybinding.IValidationResult;
 import de.fips.util.tinybinding.IValueObserver;
-import de.fips.util.tinybinding.impl.UpdateStrategy;
-
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -42,23 +39,10 @@ import lombok.Setter;
  *
  * @author Philipp Eichhorn
  */
-public final class BindingContext implements IBindingContext { 
+public final class BindingContext implements IBindingContext {
 	private final Map<Pair<?, ?>, Binding<?, ?>> bindings = new HashMap<Pair<?, ?>, Binding<?, ?>>();
 
-	public <SOURCE_TYPE, TARGET_TYPE> void bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target) {
-		bind(source, target, new UpdateStrategy<SOURCE_TYPE, TARGET_TYPE>(), new UpdateStrategy<TARGET_TYPE, SOURCE_TYPE>());
-	}
-
-	public <SOURCE_TYPE, TARGET_TYPE> void bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target,
-			final IConverter<SOURCE_TYPE, TARGET_TYPE> sourceToTarget) {
-		bind(source, target, new UpdateStrategy<SOURCE_TYPE, TARGET_TYPE>().converter(sourceToTarget), null);
-	}
-
-	public <SOURCE_TYPE, TARGET_TYPE> void bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target,
-			final IConverter<SOURCE_TYPE, TARGET_TYPE> sourceToTarget, final IConverter<TARGET_TYPE, SOURCE_TYPE> targetToSource) {
-		bind(source, target, new UpdateStrategy<SOURCE_TYPE, TARGET_TYPE>().converter(sourceToTarget), new UpdateStrategy<TARGET_TYPE, SOURCE_TYPE>().converter(targetToSource));
-	}
-
+	@Override
 	public <SOURCE_TYPE, TARGET_TYPE> void bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target,
 			final IUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> sourceToTarget, final IUpdateStrategy<TARGET_TYPE, SOURCE_TYPE> targetToSource) {
 		Binding<SOURCE_TYPE, TARGET_TYPE> binding = new Binding<SOURCE_TYPE, TARGET_TYPE>(source, target, sourceToTarget, targetToSource);
@@ -66,6 +50,7 @@ public final class BindingContext implements IBindingContext {
 		binding.bind();
 	}
 
+	@Override
 	public <SOURCE_TYPE, TARGET_TYPE> void unbind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target) {
 		Binding<SOURCE_TYPE, TARGET_TYPE> binder = uncheckedCast(bindings.get(Pair.of(source, target)));
 		if (binder != null) {
@@ -74,6 +59,7 @@ public final class BindingContext implements IBindingContext {
 		}
 	}
 
+	@Override
 	public void unbindAll() {
 		for (Pair<?, ?> key : bindings.keySet()) {
 			Binding<?, ?> binder = bindings.get(key);

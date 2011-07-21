@@ -45,7 +45,7 @@ class AbstractWeakListener<T, E> {
 			// ignore
 		}
 	}
-	
+
 	protected Object getSource() {
 		return source;
 	}

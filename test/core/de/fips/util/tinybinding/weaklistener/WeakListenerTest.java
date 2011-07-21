@@ -47,7 +47,7 @@ import de.fips.util.tinybinding.WeakReferences;
  * @author Philipp Eichhorn
  */
 public class WeakListenerTest {
-	
+
 	@Test
 	public void test_weakActionListener() {
 		ActionListener listener = mock(ActionListener.class);
@@ -60,7 +60,7 @@ public class WeakListenerTest {
 		weakListener.actionPerformed(mock(ActionEvent.class));
 		verify(button, times(1)).removeActionListener(eq(weakListener));
 	}
-	
+
 	@Test
 	public void test_weakPropertyChangeListener() {
 		PropertyChangeListener listener = mock(PropertyChangeListener.class);
@@ -73,7 +73,7 @@ public class WeakListenerTest {
 		weakListener.propertyChange(mock(PropertyChangeEvent.class));
 		verify(bean, times(1)).removePropertyChangeListener(eq((String) null), eq(weakListener));
 	}
-	
+
 	@NoArgsConstructor
 	public static class SimpleBean {
 		@Getter
@@ -84,7 +84,7 @@ public class WeakListenerTest {
 				final PropertyChangeListener listener) {
 			propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
 		}
-		
+
 		public void removePropertyChangeListener(final String propertyName,
 				final PropertyChangeListener listener) {
 			propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
