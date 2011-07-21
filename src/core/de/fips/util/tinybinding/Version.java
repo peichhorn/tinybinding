@@ -31,7 +31,7 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Version {
-	private static final String VERSION = "1.0.3-HEAD";
+	private static final String VERSION = "1.0.3";
 
 	/** Prints the version followed by a newline, and exits. */
 	public static void main(final String[] args) {
