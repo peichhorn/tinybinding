@@ -39,11 +39,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @FluentSetter
 public class UpdateStrategy<SOURCE_TYPE, TARGET_TYPE> implements IUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> {
-	private IValidator<SOURCE_TYPE> afterGetValidator;
-	private IValidator<TARGET_TYPE> beforeSetValidator;
+	private IValidator<? super SOURCE_TYPE> afterGetValidator;
+	private IValidator<? super TARGET_TYPE> beforeSetValidator;
 	private IConverter<SOURCE_TYPE, TARGET_TYPE> converter = new Converter<SOURCE_TYPE, TARGET_TYPE>();
 
-	public UpdateStrategy(final IValidator<SOURCE_TYPE> afterGetValidator, final IValidator<TARGET_TYPE> beforeSetValidator) {
+	public UpdateStrategy(final IValidator<? super SOURCE_TYPE> afterGetValidator, final IValidator<? super TARGET_TYPE> beforeSetValidator) {
 		this.afterGetValidator = afterGetValidator;
 		this.beforeSetValidator = beforeSetValidator;
 	}

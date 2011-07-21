@@ -95,12 +95,12 @@ public class OngoingBindingWithTarget<SOURCE_TYPE, TARGET_TYPE> {
 			return this;
 		}
 
-		public OngoingUpdateStrategyDef<SOURCE_TYPE_, TARGET_TYPE_> validateAfterGet(final IValidator<SOURCE_TYPE_> afterGetValidator) {
+		public OngoingUpdateStrategyDef<SOURCE_TYPE_, TARGET_TYPE_> validateAfterGet(final IValidator<? super SOURCE_TYPE_> afterGetValidator) {
 			updateStrategy.afterGetValidator(afterGetValidator);
 			return this;
 		}
 
-		public OngoingUpdateStrategyDef<SOURCE_TYPE_, TARGET_TYPE_> validateBeforeSet(final IValidator<TARGET_TYPE_> beforeSetValidator) {
+		public OngoingUpdateStrategyDef<SOURCE_TYPE_, TARGET_TYPE_> validateBeforeSet(final IValidator<? super TARGET_TYPE_> beforeSetValidator) {
 			updateStrategy.beforeSetValidator(beforeSetValidator);
 			return this;
 		}
