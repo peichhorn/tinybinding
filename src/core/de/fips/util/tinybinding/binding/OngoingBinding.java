@@ -34,33 +34,43 @@ import lombok.RequiredArgsConstructor;
 public class OngoingBinding<TYPE> {
 	private final IObservableValue<TYPE> source;
 
-	public <TARGET_TYPE> WithTarget<TYPE, TARGET_TYPE> to(final IObservableValue<TARGET_TYPE> target) {
-		return new WithTarget<TYPE, TARGET_TYPE>(source, target);
+	public <TARGET> WithTarget<TYPE, TARGET> to(final IObservableValue<TARGET> target) {
+		return new WithTarget<TYPE, TARGET>(source, target);
 	}
 	
 	@RequiredArgsConstructor(access=AccessLevel.PRIVATE)
-	public static class WithTarget<SOURCE_TYPE, TARGET_TYPE> {
-		private final IObservableValue<SOURCE_TYPE> source;
-		private final IObservableValue<TARGET_TYPE> target;
-		private UpdateStrategy<SOURCE_TYPE, TARGET_TYPE> updateSourceToTarget;
-		private UpdateStrategy<TARGET_TYPE, SOURCE_TYPE> updateTargetToSource;
+	public static class WithTarget<SOURCE, TARGET> {
+		private final IObservableValue<SOURCE> source;
+		private final IObservableValue<TARGET> target;
+		private UpdateStrategy<SOURCE, TARGET> updateTarget;
+		private UpdateStrategy<TARGET, SOURCE> updateSource;
 
-		public WithTarget<SOURCE_TYPE, TARGET_TYPE> sourceConverter(final IConverter<SOURCE_TYPE, TARGET_TYPE> sourceToTarget) {
-			getUpdateSourceToTarget().converter(sourceToTarget);
+		public WithTarget<SOURCE, TARGET> sourceConverter(final IConverter<SOURCE, TARGET> sourceToTarget) {
+			getUpdateTarget().converter(sourceToTarget);
 			return this;
 		}
 
-		public WithTarget<SOURCE_TYPE, TARGET_TYPE> targetConverter(final IConverter<TARGET_TYPE, SOURCE_TYPE> targetToSource) {
-			getUpdateTargetToSource().converter(targetToSource);
+		public WithTarget<SOURCE, TARGET> targetConverter(final IConverter<TARGET, SOURCE> targetToSource) {
+			getUpdateSource().converter(targetToSource);
 			return this;
 		}
 
-		public WithUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> updateTarget() {
-			return new WithUpdateStrategy<SOURCE_TYPE, TARGET_TYPE>(this, getUpdateSourceToTarget());
+		public WithUpdateStrategy<SOURCE, TARGET, SOURCE, TARGET> updateTarget() {
+			return new WithUpdateStrategy<SOURCE, TARGET, SOURCE, TARGET>(this, getUpdateTarget());
+		}
+		
+		public WithTarget<SOURCE, TARGET> updateTarget(UpdateStrategy<SOURCE, TARGET> updateTarget) {
+			this.updateTarget = updateTarget;
+			return this;
 		}
 
-		public WithUpdateStrategy<TARGET_TYPE, SOURCE_TYPE> updateSource() {
-			return new WithUpdateStrategy<TARGET_TYPE, SOURCE_TYPE>(this, getUpdateTargetToSource());
+		public WithUpdateStrategy<TARGET, SOURCE, SOURCE, TARGET> updateSource() {
+			return new WithUpdateStrategy<TARGET, SOURCE, SOURCE, TARGET>(this, getUpdateSource());
+		}
+
+		public WithTarget<SOURCE, TARGET> updateSource(UpdateStrategy<TARGET, SOURCE> updateSource) {
+			this.updateSource = updateSource;
+			return this;
 		}
 
 		public IBindingContext go() {
@@ -69,58 +79,62 @@ public class OngoingBinding<TYPE> {
 
 		public IBindingContext in(final IBindingContext context) {
 			if (definesUpdateStrategies()) {
-				context.bind(source, target, updateSourceToTarget, updateTargetToSource);
+				context.bind(source, target, updateTarget, updateSource);
 			} else {
-				context.bind(source, target, getUpdateSourceToTarget(), getUpdateTargetToSource());
+				context.bind(source, target, getUpdateTarget(), getUpdateSource());
 			}
 			return context;
 		}
 
-		private UpdateStrategy<SOURCE_TYPE, TARGET_TYPE> getUpdateSourceToTarget() {
-			if (updateSourceToTarget == null) {
-				updateSourceToTarget = new UpdateStrategy<SOURCE_TYPE, TARGET_TYPE>();
+		private UpdateStrategy<SOURCE, TARGET> getUpdateTarget() {
+			if (updateTarget == null) {
+				updateTarget = new UpdateStrategy<SOURCE, TARGET>();
 			}
-			return updateSourceToTarget;
+			return updateTarget;
 		}
 
-		private UpdateStrategy<TARGET_TYPE, SOURCE_TYPE> getUpdateTargetToSource() {
-			if (updateTargetToSource == null) {
-				updateTargetToSource = new UpdateStrategy<TARGET_TYPE, SOURCE_TYPE>();
+		private UpdateStrategy<TARGET, SOURCE> getUpdateSource() {
+			if (updateSource == null) {
+				updateSource = new UpdateStrategy<TARGET, SOURCE>();
 			}
-			return updateTargetToSource;
+			return updateSource;
 		}
 
 		private boolean definesUpdateStrategies() {
-			return (updateSourceToTarget != null) || (updateTargetToSource != null);
+			return (updateTarget != null) || (updateSource != null);
 		}
 	}
 	
 	@RequiredArgsConstructor(access=AccessLevel.PRIVATE)
-	public static class WithUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> {
-		private final WithTarget<?, ?> withTarget;
-		private final UpdateStrategy<SOURCE_TYPE, TARGET_TYPE> updateStrategy;
+	public static class WithUpdateStrategy<SOURCE, TARGET, SOURCE_, TARGET_> {
+		private final WithTarget<SOURCE_, TARGET_> withTarget;
+		private final UpdateStrategy<SOURCE, TARGET> updateStrategy;
 
-		public WithUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> convert(final IConverter<SOURCE_TYPE, TARGET_TYPE> converter) {
+		public WithUpdateStrategy<SOURCE, TARGET, SOURCE_, TARGET_> convert(final IConverter<SOURCE, TARGET> converter) {
 			updateStrategy.converter(converter);
 			return this;
 		}
 
-		public WithUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> validateAfterGet(final IValidator<? super SOURCE_TYPE> afterGetValidator) {
+		public WithUpdateStrategy<SOURCE, TARGET, SOURCE_, TARGET_> validateAfterGet(final IValidator<? super SOURCE> afterGetValidator) {
 			updateStrategy.afterGetValidator(afterGetValidator);
 			return this;
 		}
 
-		public WithUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> validateBeforeSet(final IValidator<? super TARGET_TYPE> beforeSetValidator) {
+		public WithUpdateStrategy<SOURCE, TARGET, SOURCE_, TARGET_> validateBeforeSet(final IValidator<? super TARGET> beforeSetValidator) {
 			updateStrategy.beforeSetValidator(beforeSetValidator);
 			return this;
 		}
 
+		public WithTarget<SOURCE_, TARGET_> and() {
+			return withTarget;
+		}
+
 		public IBindingContext go() {
-			return withTarget.go();
+			return and().go();
 		}
 
 		public IBindingContext in(final IBindingContext context) {
-			return withTarget.in(context);
+			return and().in(context);
 		}
 	}
 }

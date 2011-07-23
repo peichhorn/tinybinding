@@ -43,16 +43,16 @@ public final class BindingContext implements IBindingContext {
 	private final Map<Pair<?, ?>, Binding<?, ?>> bindings = new HashMap<Pair<?, ?>, Binding<?, ?>>();
 
 	@Override
-	public <SOURCE_TYPE, TARGET_TYPE> void bind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target,
-			final IUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> sourceToTarget, final IUpdateStrategy<TARGET_TYPE, SOURCE_TYPE> targetToSource) {
-		Binding<SOURCE_TYPE, TARGET_TYPE> binding = new Binding<SOURCE_TYPE, TARGET_TYPE>(source, target, sourceToTarget, targetToSource);
+	public <SOURCE, TARGET> void bind(final IObservableValue<SOURCE> source, final IObservableValue<TARGET> target,
+			final IUpdateStrategy<SOURCE, TARGET> sourceToTarget, final IUpdateStrategy<TARGET, SOURCE> targetToSource) {
+		Binding<SOURCE, TARGET> binding = new Binding<SOURCE, TARGET>(source, target, sourceToTarget, targetToSource);
 		bindings.put(Pair.of(source, target), binding);
 		binding.bind();
 	}
 
 	@Override
-	public <SOURCE_TYPE, TARGET_TYPE> void unbind(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target) {
-		Binding<SOURCE_TYPE, TARGET_TYPE> binder = uncheckedCast(bindings.get(Pair.of(source, target)));
+	public <SOURCE, TARGET> void unbind(final IObservableValue<SOURCE> source, final IObservableValue<TARGET> target) {
+		Binding<SOURCE, TARGET> binder = uncheckedCast(bindings.get(Pair.of(source, target)));
 		if (binder != null) {
 			bindings.put(Pair.of(source, target), null);
 			binder.unbind();
@@ -70,18 +70,18 @@ public final class BindingContext implements IBindingContext {
 		bindings.clear();
 	}
 
-	private static class Binding<SOURCE_TYPE, TARGET_TYPE> {
-		private final IObservableValue<SOURCE_TYPE> source;
-		private final IObservableValue<TARGET_TYPE> target;
-		private final ValueObserver<SOURCE_TYPE, TARGET_TYPE> sourceObserver;
-		private final ValueObserver<TARGET_TYPE, SOURCE_TYPE> targetObserver;
+	private static class Binding<SOURCE, TARGET> {
+		private final IObservableValue<SOURCE> source;
+		private final IObservableValue<TARGET> target;
+		private final ValueObserver<SOURCE, TARGET> sourceObserver;
+		private final ValueObserver<TARGET, SOURCE> targetObserver;
 
-		public Binding(final IObservableValue<SOURCE_TYPE> source, final IObservableValue<TARGET_TYPE> target, final IUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> sourceToTarget,
-				final IUpdateStrategy<TARGET_TYPE, SOURCE_TYPE> targetToSource) {
+		public Binding(final IObservableValue<SOURCE> source, final IObservableValue<TARGET> target, final IUpdateStrategy<SOURCE, TARGET> sourceToTarget,
+				final IUpdateStrategy<TARGET, SOURCE> targetToSource) {
 			this.source = source;
 			this.target = target;
-			sourceObserver = new ValueObserver<SOURCE_TYPE, TARGET_TYPE>(source, target, sourceToTarget);
-			targetObserver = new ValueObserver<TARGET_TYPE, SOURCE_TYPE>(target, source, targetToSource);
+			sourceObserver = new ValueObserver<SOURCE, TARGET>(source, target, sourceToTarget);
+			targetObserver = new ValueObserver<TARGET, SOURCE>(target, source, targetToSource);
 			sourceObserver.setTargetObserver(targetObserver);
 			targetObserver.setTargetObserver(sourceObserver);
 		}

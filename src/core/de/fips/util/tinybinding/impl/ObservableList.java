@@ -38,55 +38,55 @@ import lombok.RequiredArgsConstructor;
  * @author Philipp Eichhorn
  */
 @RequiredArgsConstructor
-public class ObservableList<ELEMENT_TYPE> extends AbstractList<ELEMENT_TYPE> implements IObservableList<ELEMENT_TYPE> {
-	private final List<ELEMENT_TYPE> list;
-	private final List<IListObserver<ELEMENT_TYPE>> registeredObservers = new CopyOnWriteArrayList<IListObserver<ELEMENT_TYPE>>();
+public class ObservableList<ELEMENT> extends AbstractList<ELEMENT> implements IObservableList<ELEMENT> {
+	private final List<ELEMENT> list;
+	private final List<IListObserver<ELEMENT>> registeredObservers = new CopyOnWriteArrayList<IListObserver<ELEMENT>>();
 
 	@Override
-	public ELEMENT_TYPE set(final int index, final ELEMENT_TYPE element) {
-		ELEMENT_TYPE oldValue = list.set(index, element);
-		for (IListObserver<ELEMENT_TYPE> observer : registeredObservers) {
+	public ELEMENT set(final int index, final ELEMENT element) {
+		ELEMENT oldValue = list.set(index, element);
+		for (IListObserver<ELEMENT> observer : registeredObservers) {
 			observer.valueReplaced(this, index, oldValue);
 		}
 		return oldValue;
 	}
 
 	@Override
-	public void add(final int index, final ELEMENT_TYPE element) {
+	public void add(final int index, final ELEMENT element) {
 		list.add(index, element);
 		modCount++;
-		for (IListObserver<ELEMENT_TYPE> observer : registeredObservers) {
+		for (IListObserver<ELEMENT> observer : registeredObservers) {
 			observer.valuesAdded(this, index, 1);
 		}
 	}
 
 	@Override
-	public ELEMENT_TYPE remove(final int index) {
-		ELEMENT_TYPE oldValue = list.remove(index);
+	public ELEMENT remove(final int index) {
+		ELEMENT oldValue = list.remove(index);
 		modCount++;
-		for (IListObserver<ELEMENT_TYPE> observer : registeredObservers) {
+		for (IListObserver<ELEMENT> observer : registeredObservers) {
 			observer.valuesRemoved(this, index, Collections.singletonList(oldValue));
 		}
 		return oldValue;
 	}
 
 	@Override
-	public boolean addAll(final Collection<? extends ELEMENT_TYPE> c) {
+	public boolean addAll(final Collection<? extends ELEMENT> c) {
 		return addAll(size(), c);
 	}
 
 	@Override
-	public boolean addAll(final int index, final Collection<? extends ELEMENT_TYPE> c) {
+	public boolean addAll(final int index, final Collection<? extends ELEMENT> c) {
 		if (list.addAll(index, c)) {
 			modCount++;
-			for (IListObserver<ELEMENT_TYPE> observer : registeredObservers) {
+			for (IListObserver<ELEMENT> observer : registeredObservers) {
 				observer.valuesAdded(this, index, c.size());
 			}
 		}
 		return false;
 	}
 
-	public ELEMENT_TYPE get(int index) {
+	public ELEMENT get(int index) {
 		return list.get(index);
 	}
 
@@ -96,23 +96,23 @@ public class ObservableList<ELEMENT_TYPE> extends AbstractList<ELEMENT_TYPE> imp
 
 	@Override
 	public void clear() {
-		List<ELEMENT_TYPE> dup = new ArrayList<ELEMENT_TYPE>(list);
+		List<ELEMENT> dup = new ArrayList<ELEMENT>(list);
 		list.clear();
 		modCount++;
-		if (!dup.isEmpty()) for (IListObserver<ELEMENT_TYPE> observer : registeredObservers) {
+		if (!dup.isEmpty()) for (IListObserver<ELEMENT> observer : registeredObservers) {
 			observer.valuesRemoved(this, 0, dup);
 		}
 	}
 
 	@Override
-	public void addObserver(final IListObserver<ELEMENT_TYPE> observer) {
+	public void addObserver(final IListObserver<ELEMENT> observer) {
 		if (!registeredObservers.contains(observer)) {
 			registeredObservers.add(observer);
 		}
 	}
 
 	@Override
-	public void removeObserver(final IListObserver<ELEMENT_TYPE> observer) {
+	public void removeObserver(final IListObserver<ELEMENT> observer) {
 		registeredObservers.remove(observer);
 	}
 }

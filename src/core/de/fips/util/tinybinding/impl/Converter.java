@@ -28,10 +28,10 @@ import de.fips.util.tinybinding.util.Cast;
  *
  * @author Philipp Eichhorn
  */
-public final class Converter<SOURCE_TYPE, TARGET_TYPE> implements IConverter<SOURCE_TYPE, TARGET_TYPE> {
+public final class Converter<SOURCE, TARGET> implements IConverter<SOURCE, TARGET> {
 
 	@Override
-	public final TARGET_TYPE convert(final SOURCE_TYPE source) {
-		return Cast.<TARGET_TYPE>uncheckedCast(source);
+	public final TARGET convert(final SOURCE source) {
+		return Cast.<TARGET>uncheckedCast(source);
 	}
 }

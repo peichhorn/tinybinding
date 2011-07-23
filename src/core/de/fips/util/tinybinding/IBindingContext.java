@@ -26,10 +26,10 @@ package de.fips.util.tinybinding;
  * @author Philipp Eichhorn
  */
 public interface IBindingContext {
-	public <SOURCE_TYPE, TARGET_TYPE> void bind(IObservableValue<SOURCE_TYPE> source, IObservableValue<TARGET_TYPE> target,
-			IUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> sourceToTarget, IUpdateStrategy<TARGET_TYPE, SOURCE_TYPE> targetToSource);
+	public <SOURCE, TARGET> void bind(IObservableValue<SOURCE> source, IObservableValue<TARGET> target,
+			IUpdateStrategy<SOURCE, TARGET> sourceToTarget, IUpdateStrategy<TARGET, SOURCE> targetToSource);
 
-	public <SOURCE_TYPE, TARGET_TYPE> void unbind(IObservableValue<SOURCE_TYPE> source, IObservableValue<TARGET_TYPE> target);
+	public <SOURCE, TARGET> void unbind(IObservableValue<SOURCE> source, IObservableValue<TARGET> target);
 
 	public void unbindAll();
 }

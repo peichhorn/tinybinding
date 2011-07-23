@@ -29,11 +29,11 @@ import java.util.List;
  *
  * @author Philipp Eichhorn
  */
-public interface IListObserver<ELEMENT_TYPE> {
+public interface IListObserver<ELEMENT> {
 
-	public void valuesAdded(IObservableList<ELEMENT_TYPE> list, int index, int length);
+	public void valuesAdded(IObservableList<ELEMENT> list, int index, int length);
 
-	public void valuesRemoved(IObservableList<ELEMENT_TYPE> list, int index, List<ELEMENT_TYPE> oldElements);
+	public void valuesRemoved(IObservableList<ELEMENT> list, int index, List<ELEMENT> oldElements);
 
-	public void valueReplaced(IObservableList<ELEMENT_TYPE> list, int index, ELEMENT_TYPE oldElement);
+	public void valueReplaced(IObservableList<ELEMENT> list, int index, ELEMENT oldElement);
 }

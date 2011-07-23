@@ -38,12 +38,12 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public class Observable {
-	public <KEY_TYPE, VALUE_TYPE> IObservableMap<KEY_TYPE, VALUE_TYPE> map(final Map<KEY_TYPE, VALUE_TYPE> map) {
-		return new ObservableMap<KEY_TYPE, VALUE_TYPE>(map);
+	public <KEY, VALUE> IObservableMap<KEY, VALUE> map(final Map<KEY, VALUE> map) {
+		return new ObservableMap<KEY, VALUE>(map);
 	}
 
-	public <ELEMENT_TYPE> IObservableList<ELEMENT_TYPE> list(final List<ELEMENT_TYPE> list) {
-		return new ObservableList<ELEMENT_TYPE>(list);
+	public <ELEMENT> IObservableList<ELEMENT> list(final List<ELEMENT> list) {
+		return new ObservableList<ELEMENT>(list);
 	}
 
 	public <TYPE> IObservableValue<TYPE> value(final TYPE value) {

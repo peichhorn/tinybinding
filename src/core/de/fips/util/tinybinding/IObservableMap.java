@@ -29,9 +29,9 @@ import java.util.Map;
  *
  * @author Philipp Eichhorn
  */
-public interface IObservableMap<KEY_TYPE, VALUE_TYPE> extends Map<KEY_TYPE, VALUE_TYPE> {
+public interface IObservableMap<KEY, VALUE> extends Map<KEY, VALUE> {
 
-	public void addObserver(IMapObserver<KEY_TYPE, VALUE_TYPE> observer);
+	public void addObserver(IMapObserver<KEY, VALUE> observer);
 
-	public void removeObserver(IMapObserver<KEY_TYPE, VALUE_TYPE> observer);
+	public void removeObserver(IMapObserver<KEY, VALUE> observer);
 }

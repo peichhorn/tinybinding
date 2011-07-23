@@ -40,14 +40,14 @@ import lombok.RequiredArgsConstructor;
  * @author Philipp Eichhorn
  */
 @RequiredArgsConstructor
-public class ObservableMap<KEY_TYPE, VALUE_TYPE> extends AbstractMap<KEY_TYPE, VALUE_TYPE> implements IObservableMap<KEY_TYPE, VALUE_TYPE> {
-	private final Map<KEY_TYPE, VALUE_TYPE> map;
-	private final List<IMapObserver<KEY_TYPE, VALUE_TYPE>> registeredObservers = new CopyOnWriteArrayList<IMapObserver<KEY_TYPE, VALUE_TYPE>>();
-	private Set<Map.Entry<KEY_TYPE, VALUE_TYPE>> entrySet;
+public class ObservableMap<KEY, VALUE> extends AbstractMap<KEY, VALUE> implements IObservableMap<KEY, VALUE> {
+	private final Map<KEY, VALUE> map;
+	private final List<IMapObserver<KEY, VALUE>> registeredObservers = new CopyOnWriteArrayList<IMapObserver<KEY, VALUE>>();
+	private Set<Map.Entry<KEY, VALUE>> entrySet;
 
 	@Override
 	public void clear() {
-		Iterator<KEY_TYPE> iterator = keySet().iterator();
+		Iterator<KEY> iterator = keySet().iterator();
 		while (iterator.hasNext()) {
 			iterator.next();
 			iterator.remove();
@@ -55,21 +55,21 @@ public class ObservableMap<KEY_TYPE, VALUE_TYPE> extends AbstractMap<KEY_TYPE, V
 	}
 
 	@Override
-	public Set<Map.Entry<KEY_TYPE, VALUE_TYPE>> entrySet() {
-		Set<Map.Entry<KEY_TYPE, VALUE_TYPE>> es = entrySet;
+	public Set<Map.Entry<KEY, VALUE>> entrySet() {
+		Set<Map.Entry<KEY, VALUE>> es = entrySet;
 		return es != null ? es : (entrySet = new EntrySet());
 	}
 
 	@Override
-	public VALUE_TYPE put(final KEY_TYPE key, final VALUE_TYPE value) {
+	public VALUE put(final KEY key, final VALUE value) {
 		boolean alreadyContainsKey = containsKey(key);
-		VALUE_TYPE lastValue = map.put(key, value);
+		VALUE lastValue = map.put(key, value);
 		if (alreadyContainsKey) {
-			for (IMapObserver<KEY_TYPE, VALUE_TYPE> observer : registeredObservers) {
+			for (IMapObserver<KEY, VALUE> observer : registeredObservers) {
 				observer.valueChanged(this, key, lastValue);
 			}
 		} else {
-			for (IMapObserver<KEY_TYPE, VALUE_TYPE> observer : registeredObservers) {
+			for (IMapObserver<KEY, VALUE> observer : registeredObservers) {
 				observer.valueAdded(this, key);
 			}
 		}
@@ -77,11 +77,11 @@ public class ObservableMap<KEY_TYPE, VALUE_TYPE> extends AbstractMap<KEY_TYPE, V
 	}
 
 	@Override
-	public VALUE_TYPE remove(final Object o) {
+	public VALUE remove(final Object o) {
 		if (containsKey(o)) {
-			VALUE_TYPE value = map.remove(o);
-			KEY_TYPE key = Cast.<KEY_TYPE>uncheckedCast(o);
-			for (IMapObserver<KEY_TYPE, VALUE_TYPE> observer : registeredObservers) {
+			VALUE value = map.remove(o);
+			KEY key = Cast.<KEY>uncheckedCast(o);
+			for (IMapObserver<KEY, VALUE> observer : registeredObservers) {
 				observer.valueRemoved(this, key, value);
 			}
 			return value;
@@ -94,20 +94,20 @@ public class ObservableMap<KEY_TYPE, VALUE_TYPE> extends AbstractMap<KEY_TYPE, V
 	}
 
 	@Override
-	public void addObserver(final IMapObserver<KEY_TYPE, VALUE_TYPE> observer) {
+	public void addObserver(final IMapObserver<KEY, VALUE> observer) {
 		if (!registeredObservers.contains(observer)) {
 			registeredObservers.add(observer);
 		}
 	}
 
 	@Override
-	public void removeObserver(final IMapObserver<KEY_TYPE, VALUE_TYPE> observer) {
+	public void removeObserver(final IMapObserver<KEY, VALUE> observer) {
 		registeredObservers.remove(observer);
 	}
 
-	private class EntryIterator implements Iterator<Map.Entry<KEY_TYPE, VALUE_TYPE>> {
-		private final Iterator<Map.Entry<KEY_TYPE, VALUE_TYPE>> iterator = map.entrySet().iterator();
-		private Map.Entry<KEY_TYPE, VALUE_TYPE> last;
+	private class EntryIterator implements Iterator<Map.Entry<KEY, VALUE>> {
+		private final Iterator<Map.Entry<KEY, VALUE>> iterator = map.entrySet().iterator();
+		private Map.Entry<KEY, VALUE> last;
 
 		@Override
 		public boolean hasNext() {
@@ -115,7 +115,7 @@ public class ObservableMap<KEY_TYPE, VALUE_TYPE> extends AbstractMap<KEY_TYPE, V
 		}
 
 		@Override
-		public Map.Entry<KEY_TYPE, VALUE_TYPE> next() {
+		public Map.Entry<KEY, VALUE> next() {
 			last = iterator.next();
 			return last;
 		}
@@ -131,9 +131,9 @@ public class ObservableMap<KEY_TYPE, VALUE_TYPE> extends AbstractMap<KEY_TYPE, V
 		}
 	}
 
-	private class EntrySet extends AbstractSet<Map.Entry<KEY_TYPE, VALUE_TYPE>> {
+	private class EntrySet extends AbstractSet<Map.Entry<KEY, VALUE>> {
 		@Override
-		public Iterator<Map.Entry<KEY_TYPE, VALUE_TYPE>> iterator() {
+		public Iterator<Map.Entry<KEY, VALUE>> iterator() {
 			return new EntryIterator();
 		}
 
@@ -142,15 +142,15 @@ public class ObservableMap<KEY_TYPE, VALUE_TYPE> extends AbstractMap<KEY_TYPE, V
 			if (!(o instanceof Map.Entry)) {
 				return false;
 			}
-			Map.Entry<KEY_TYPE, VALUE_TYPE> e = Cast.uncheckedCast(o);
+			Map.Entry<KEY, VALUE> e = Cast.uncheckedCast(o);
 			return containsKey(e.getKey());
 		}
 
 		@Override
 		public boolean remove(final Object o) {
 			if (o instanceof Map.Entry) {
-				Map.Entry<KEY_TYPE, VALUE_TYPE> entry = Cast.uncheckedCast(o);
-				KEY_TYPE key = entry.getKey();
+				Map.Entry<KEY, VALUE> entry = Cast.uncheckedCast(o);
+				KEY key = entry.getKey();
 				if (containsKey(key)) {
 					remove(key);
 					return true;

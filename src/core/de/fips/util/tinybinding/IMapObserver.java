@@ -27,11 +27,11 @@ package de.fips.util.tinybinding;
  *
  * @author Philipp Eichhorn
  */
-public interface IMapObserver<KEY_TYPE, VALUE_TYPE> {
+public interface IMapObserver<KEY, VALUE> {
 
-	public void valueChanged(IObservableMap<KEY_TYPE, VALUE_TYPE> map, KEY_TYPE key, VALUE_TYPE lastValue);
+	public void valueChanged(IObservableMap<KEY, VALUE> map, KEY key, VALUE lastValue);
 
-	public void valueAdded(IObservableMap<KEY_TYPE, VALUE_TYPE> map, KEY_TYPE key);
+	public void valueAdded(IObservableMap<KEY, VALUE> map, KEY key);
 
-	public void valueRemoved(IObservableMap<KEY_TYPE, VALUE_TYPE> map, KEY_TYPE key, VALUE_TYPE value);
+	public void valueRemoved(IObservableMap<KEY, VALUE> map, KEY key, VALUE value);
 }

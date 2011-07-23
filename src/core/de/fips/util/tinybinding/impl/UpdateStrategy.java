@@ -38,33 +38,33 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @FluentSetter
-public class UpdateStrategy<SOURCE_TYPE, TARGET_TYPE> implements IUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> {
-	private IValidator<? super SOURCE_TYPE> afterGetValidator;
-	private IValidator<? super TARGET_TYPE> beforeSetValidator;
-	private IConverter<SOURCE_TYPE, TARGET_TYPE> converter = new Converter<SOURCE_TYPE, TARGET_TYPE>();
+public class UpdateStrategy<SOURCE, TARGET> implements IUpdateStrategy<SOURCE, TARGET> {
+	private IValidator<? super SOURCE> afterGetValidator;
+	private IValidator<? super TARGET> beforeSetValidator;
+	private IConverter<SOURCE, TARGET> converter = new Converter<SOURCE, TARGET>();
 
-	public UpdateStrategy(final IValidator<? super SOURCE_TYPE> afterGetValidator, final IValidator<? super TARGET_TYPE> beforeSetValidator) {
+	public UpdateStrategy(final IValidator<? super SOURCE> afterGetValidator, final IValidator<? super TARGET> beforeSetValidator) {
 		this.afterGetValidator = afterGetValidator;
 		this.beforeSetValidator = beforeSetValidator;
 	}
 
 	@Override
-	public TARGET_TYPE convert(final SOURCE_TYPE source) {
+	public TARGET convert(final SOURCE source) {
 		return converter.convert(source);
 	}
 
 	@Override
-	public void doSet(final IObservableValue<TARGET_TYPE> value, final TARGET_TYPE object) {
+	public void doSet(final IObservableValue<TARGET> value, final TARGET object) {
 		value.set(object);
 	}
 
 	@Override
-	public IValidationResult validateAfterGet(final SOURCE_TYPE source) {
+	public IValidationResult validateAfterGet(final SOURCE source) {
 		return (afterGetValidator == null) ? ok() : afterGetValidator.validate(source);
 	}
 
 	@Override
-	public IValidationResult validateBeforeSet(final TARGET_TYPE target) {
+	public IValidationResult validateBeforeSet(final TARGET target) {
 		return (beforeSetValidator == null) ? ok() : beforeSetValidator.validate(target);
 	}
 }

@@ -130,7 +130,7 @@ public final class AutoBinder {
 		return null;
 	}
 
-	private static <ANNOTATION_TYPE extends Annotation> Class<?> getAnnotatedClass(final Object object, final String objectName, final Class<ANNOTATION_TYPE> annotationClazz) {
+	private static <ANNOTATION extends Annotation> Class<?> getAnnotatedClass(final Object object, final String objectName, final Class<ANNOTATION> annotationClazz) {
 		verifyNotNull(object, objectName);
 		Class<?> clazz = object.getClass();
 		verifyClassIsAnnotatedWith(clazz, annotationClazz);
@@ -142,7 +142,7 @@ public final class AutoBinder {
 			throw invalid("'%s' may not be null.", objectName);
 	}
 
-	private static <ANNOTATION_TYPE extends Annotation> void verifyClassIsAnnotatedWith(final Class<?> clazz, final Class<ANNOTATION_TYPE> annotationClazz) {
+	private static <ANNOTATION extends Annotation> void verifyClassIsAnnotatedWith(final Class<?> clazz, final Class<ANNOTATION> annotationClazz) {
 		if (clazz.getAnnotation(annotationClazz) == null)
 			throw invalid("'%s' needs to be annotated with '@%s'.", clazz.getName(), annotationClazz.getName());
 	}

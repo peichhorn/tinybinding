@@ -37,14 +37,14 @@ import de.fips.util.tinybinding.impl.ObservableValue;
  * garbage collected when the time comes.
  *
  * @param <TYPE> Type of the observed value.
- * @param <COMPONENT_TYPE> Type of the observed Swing Component.
+ * @param <COMPONENT> Type of the observed Swing Component.
  * @author Philipp Eichhorn
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-abstract class ObservableComponentValue<TYPE, COMPONENT_TYPE extends Container> extends ObservableValue<TYPE> {
+abstract class ObservableComponentValue<TYPE, COMPONENT extends Container> extends ObservableValue<TYPE> {
 	@NonNull
 	@Getter(AccessLevel.PROTECTED)
-	private final COMPONENT_TYPE component;
+	private final COMPONENT component;
 	private volatile boolean propertyChange;
 
 	protected final void guardedUpdateValue() {

@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class WeakReferences {
 
-	public static <S, T extends S> WeakListenerWithType<S, T> weakListener(final Class<S> listenerType, final T listener) {
-		return new WeakListenerWithType<S, T>(listenerType, listener);
+	public static <SUPER_TYPE, TYPE extends SUPER_TYPE> WeakListenerWithType<SUPER_TYPE, TYPE> weakListener(final Class<SUPER_TYPE> listenerType, final TYPE listener) {
+		return new WeakListenerWithType<SUPER_TYPE, TYPE>(listenerType, listener);
 	}
 }

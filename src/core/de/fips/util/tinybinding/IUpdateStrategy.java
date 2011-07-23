@@ -25,12 +25,12 @@ package de.fips.util.tinybinding;
  *
  * @author Philipp Eichhorn
  */
-public interface IUpdateStrategy<SOURCE_TYPE, TARGET_TYPE> {
-	public IValidationResult validateAfterGet(SOURCE_TYPE object);
+public interface IUpdateStrategy<SOURCE, TARGET> {
+	public IValidationResult validateAfterGet(SOURCE object);
 
-	public TARGET_TYPE convert(SOURCE_TYPE source);
+	public TARGET convert(SOURCE source);
 
-	public IValidationResult validateBeforeSet(TARGET_TYPE object);
+	public IValidationResult validateBeforeSet(TARGET object);
 
-	public void doSet(IObservableValue<TARGET_TYPE> value, TARGET_TYPE object);
+	public void doSet(IObservableValue<TARGET> value, TARGET object);
 }

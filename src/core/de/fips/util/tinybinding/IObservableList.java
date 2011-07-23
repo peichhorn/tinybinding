@@ -29,9 +29,9 @@ import java.util.List;
  *
  * @author Philipp Eichhorn
  */
-public interface IObservableList<ELEMENT_TYPE> extends List<ELEMENT_TYPE> {
+public interface IObservableList<ELEMENT> extends List<ELEMENT> {
 
-	public void addObserver(IListObserver<ELEMENT_TYPE> observer);
+	public void addObserver(IListObserver<ELEMENT> observer);
 
-	public void removeObserver(IListObserver<ELEMENT_TYPE> observer);
+	public void removeObserver(IListObserver<ELEMENT> observer);
 }
