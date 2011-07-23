@@ -41,11 +41,11 @@ import de.fips.util.tinybinding.IObservableValue;
 import de.fips.util.tinybinding.IValueObserver;
 
 /**
- * Tests the {@link PojoObservables}.
+ * Tests the {@link PojoObservable}.
  *
  * @author Philipp Eichhorn
  */
-public class PojoObservablesTest {
+public class PojoObservableTest {
 	private TestPojo1 pojo1;
 	private TestPojo2 pojo2;
 

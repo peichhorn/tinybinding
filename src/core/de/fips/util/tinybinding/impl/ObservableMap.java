@@ -33,7 +33,6 @@ import de.fips.util.tinybinding.IMapObserver;
 import de.fips.util.tinybinding.IObservableMap;
 import de.fips.util.tinybinding.util.Cast;
 
-import lombok.Delegate;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -42,7 +41,6 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public class ObservableMap<KEY_TYPE, VALUE_TYPE> extends AbstractMap<KEY_TYPE, VALUE_TYPE> implements IObservableMap<KEY_TYPE, VALUE_TYPE> {
-	@Delegate(excludes = IMap.class)
 	private final Map<KEY_TYPE, VALUE_TYPE> map;
 	private final List<IMapObserver<KEY_TYPE, VALUE_TYPE>> registeredObservers = new CopyOnWriteArrayList<IMapObserver<KEY_TYPE, VALUE_TYPE>>();
 	private Set<Map.Entry<KEY_TYPE, VALUE_TYPE>> entrySet;
@@ -64,8 +62,9 @@ public class ObservableMap<KEY_TYPE, VALUE_TYPE> extends AbstractMap<KEY_TYPE, V
 
 	@Override
 	public VALUE_TYPE put(final KEY_TYPE key, final VALUE_TYPE value) {
+		boolean alreadyContainsKey = containsKey(key);
 		VALUE_TYPE lastValue = map.put(key, value);
-		if (containsKey(key)) {
+		if (alreadyContainsKey) {
 			for (IMapObserver<KEY_TYPE, VALUE_TYPE> observer : registeredObservers) {
 				observer.valueChanged(this, key, lastValue);
 			}
@@ -75,13 +74,6 @@ public class ObservableMap<KEY_TYPE, VALUE_TYPE> extends AbstractMap<KEY_TYPE, V
 			}
 		}
 		return lastValue;
-	}
-
-	@Override
-	public void putAll(final Map<? extends KEY_TYPE, ? extends VALUE_TYPE> m) {
-		for (Map.Entry<? extends KEY_TYPE, ? extends VALUE_TYPE> entry : m.entrySet()) {
-			put(entry.getKey(), entry.getValue());
-		}
 	}
 
 	@Override
@@ -95,6 +87,10 @@ public class ObservableMap<KEY_TYPE, VALUE_TYPE> extends AbstractMap<KEY_TYPE, V
 			return value;
 		}
 		return null;
+	}
+	
+	public int size() {
+		return map.size();
 	}
 
 	@Override
@@ -172,13 +168,5 @@ public class ObservableMap<KEY_TYPE, VALUE_TYPE> extends AbstractMap<KEY_TYPE, V
 		public void clear() {
 			ObservableMap.this.clear();
 		}
-	}
-
-	private static interface IMap<K, V> {
-		void clear();
-		Set<Map.Entry<K, V>> entrySet();
-		V put(final K key, final V value);
-		void putAll(final Map<? extends K, ? extends V> m);
-		V remove(final Object o);
 	}
 }

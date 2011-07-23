@@ -19,27 +19,50 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package de.fips.util.tinybinding;
+package de.fips.util.tinybinding.impl;
 
-import static de.fips.util.tinybinding.Observables.observe;
+import static de.fips.util.tinybinding.ValidationResultCondition.ok;
 import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.Mockito.*;
-
-import java.awt.Container;
 
 import org.junit.Test;
 
-import de.fips.util.tinybinding.pojo.PojoObservable;
-import de.fips.util.tinybinding.swing.SwingObservable;
+import de.fips.util.tinybinding.IValidationResult;
+import de.fips.util.tinybinding.IValidator;
 
-public class ObservablesTest {
+/**
+ * Tests the {@link Validator}.
+ *
+ * @author Philipp Eichhorn
+ */
+public class ValidatorTest {
+
 	@Test
-	public void test_observeContainerCreatesSwingObservable() {
-		assertThat(observe(mock(Container.class))).isInstanceOf(SwingObservable.class);
+	public void whenValueIsEmpty_validate_shouldReturnAnOkValidationResult() {
+		// setup
+		final IValidator<String> validator = new Validator<String>();
+		// run 
+		final IValidationResult result = validator.validate("");
+		// assert
+		assertThat(result).is(ok());
 	}
 
 	@Test
-	public void test_observeObjectCreatesPojoObservable() {
-		assertThat(observe(mock(Object.class))).isInstanceOf(PojoObservable.class);
+	public void whenValueIsNull_validate_shouldReturnAnOkValidationResult() {
+		// setup
+		final IValidator<String> validator = new Validator<String>();
+		// run 
+		final IValidationResult result = validator.validate(null);
+		// assert
+		assertThat(result).is(ok());
+	}
+
+	@Test
+	public void whenValueIsFoo_validate_shouldReturnAnOkValidationResult() {
+		// setup
+		final IValidator<String> validator = new Validator<String>();
+		// run 
+		final IValidationResult result = validator.validate("foo");
+		// assert
+		assertThat(result).is(ok());
 	}
 }

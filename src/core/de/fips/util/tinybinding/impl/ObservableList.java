@@ -31,7 +31,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import de.fips.util.tinybinding.IListObserver;
 import de.fips.util.tinybinding.IObservableList;
 
-import lombok.Delegate;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -40,7 +39,6 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public class ObservableList<ELEMENT_TYPE> extends AbstractList<ELEMENT_TYPE> implements IObservableList<ELEMENT_TYPE> {
-	@Delegate(excludes = IList.class)
 	private final List<ELEMENT_TYPE> list;
 	private final List<IListObserver<ELEMENT_TYPE>> registeredObservers = new CopyOnWriteArrayList<IListObserver<ELEMENT_TYPE>>();
 
@@ -88,6 +86,14 @@ public class ObservableList<ELEMENT_TYPE> extends AbstractList<ELEMENT_TYPE> imp
 		return false;
 	}
 
+	public ELEMENT_TYPE get(int index) {
+		return list.get(index);
+	}
+
+	public int size() {
+		return list.size();
+	}
+
 	@Override
 	public void clear() {
 		List<ELEMENT_TYPE> dup = new ArrayList<ELEMENT_TYPE>(list);
@@ -108,14 +114,5 @@ public class ObservableList<ELEMENT_TYPE> extends AbstractList<ELEMENT_TYPE> imp
 	@Override
 	public void removeObserver(final IListObserver<ELEMENT_TYPE> observer) {
 		registeredObservers.remove(observer);
-	}
-
-	private static interface IList<E> {
-		E set(final int index, final E element);
-		void add(final int index, final E element);
-		E remove(final int index);
-		boolean addAll(final Collection<? extends E> c);
-		boolean addAll(final int index, final Collection<? extends E> c);
-		void clear();
 	}
 }

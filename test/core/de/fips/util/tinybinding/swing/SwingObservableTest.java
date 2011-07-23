@@ -53,7 +53,7 @@ import de.fips.util.tinybinding.IObservableValue;
 import de.fips.util.tinybinding.IValueObserver;
 
 /**
- * Tests the {@link SwingObservables}
+ * Tests the {@link SwingObservable}
  *
  * @author Philipp Eichhorn
  */
