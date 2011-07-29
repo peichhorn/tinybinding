@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding.impl;
 
-import static de.fips.util.tinybinding.ValidationResultCondition.*;
+import static de.fips.util.tinybinding.junit.ValidationResultCondition.*;
 import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Matchers.*;
@@ -31,11 +31,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.fips.util.tinybinding.ExpectedException;
 import de.fips.util.tinybinding.IConverter;
 import de.fips.util.tinybinding.IObservableValue;
 import de.fips.util.tinybinding.IValidator;
 import de.fips.util.tinybinding.ValidationResults;
+import de.fips.util.tinybinding.junit.ExpectedException;
 
 /**
  * Tests the {@link UpdateStrategy}.

@@ -57,7 +57,6 @@ public class SearchDemo implements Application {
 	@SwingInvokeLater
 	public void runApp(final String[] args) throws Throwable {
 		with(new JFrame("Search Demo"),
-			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE),
 			setLayout(new BorderLayout()),
 			getContentPane().add(new SearchDemoViewLogic().createView(), BorderLayout.CENTER),
 			pack(),

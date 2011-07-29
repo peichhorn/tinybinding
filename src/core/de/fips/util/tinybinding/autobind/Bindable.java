@@ -27,15 +27,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that the annotated object is a data model.
+ * Used on a type it means the same as all fields of the type being
+ * annotated with {@code @Bindable}.
  * <p>
- * A data model can be bound to a form using the {@link AutoBinder}.
- *
- * @see Form
+ * Used on a field it indicates that the annotated field can be bound to
+ * another field with the same name or field-name and the same type. * 
+ * 
  * @see AutoBinder#bind(Object, Object)
  * @author Philipp Eichhorn
  */
-@Target(ElementType.TYPE)
+@Target({ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Model {
+public @interface Bindable {
+	String name() default "";
 }

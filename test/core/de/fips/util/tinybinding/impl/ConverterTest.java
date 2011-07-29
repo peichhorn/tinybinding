@@ -26,8 +26,8 @@ import static org.fest.assertions.Assertions.assertThat;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.fips.util.tinybinding.ExpectedException;
 import de.fips.util.tinybinding.impl.Converter;
+import de.fips.util.tinybinding.junit.ExpectedException;
 
 /**
  * Tests the {@link Converter}.

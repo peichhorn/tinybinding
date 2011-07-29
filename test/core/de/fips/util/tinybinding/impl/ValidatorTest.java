@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding.impl;
 
-import static de.fips.util.tinybinding.ValidationResultCondition.ok;
+import static de.fips.util.tinybinding.junit.ValidationResultCondition.ok;
 import static org.fest.assertions.Assertions.assertThat;
 
 import org.junit.Test;

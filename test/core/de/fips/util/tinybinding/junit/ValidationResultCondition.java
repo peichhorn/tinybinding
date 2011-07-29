@@ -19,11 +19,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package de.fips.util.tinybinding;
+package de.fips.util.tinybinding.junit;
 
 import lombok.RequiredArgsConstructor;
 
 import org.fest.assertions.Condition;
+
+import de.fips.util.tinybinding.IValidationResult;
 
 @RequiredArgsConstructor
 public class ValidationResultCondition extends Condition<Object> {

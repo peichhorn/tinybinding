@@ -39,8 +39,8 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import de.fips.util.tinybinding.autobind.AutoBinder;
-import de.fips.util.tinybinding.autobind.Form;
-import de.fips.util.tinybinding.autobind.Model;
+import de.fips.util.tinybinding.autobind.Bindable;
+import de.fips.util.tinybinding.autobind.SwingBindable;
 
 import lombok.Application;
 import lombok.SwingInvokeLater;
@@ -57,7 +57,6 @@ public class SimpleDemo implements Application {
 			throw new RuntimeException(e);
 		}
 		with(new JFrame("Simple Demo"),
-			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE),
 			setLayout(new BorderLayout()),
 			getContentPane().add(form, BorderLayout.CENTER),
 			getContentPane().add(new JButton(new LoginAction(model)), BorderLayout.SOUTH),
@@ -90,13 +89,15 @@ public class SimpleDemo implements Application {
 		}
 	}
 
-	@Form
 	public static class LoginForm extends JPanel {
 		private static final long serialVersionUID = 7239761542065605502L;
 
-		public final JTextField loginName = new JTextField();
-		public final JPasswordField password = new JPasswordField();
-		public final JCheckBox autologin = new JCheckBox("Auto Login");
+		@SwingBindable(hint="text")
+		private final JTextField loginName = new JTextField();
+		@SwingBindable(hint="text")
+		private final JPasswordField password = new JPasswordField();
+		@SwingBindable(hint="selected")
+		private final JCheckBox autologin = new JCheckBox("Auto Login");
 
 		public LoginForm() {
 			super();
@@ -109,10 +110,10 @@ public class SimpleDemo implements Application {
 		}
 	}
 
-	@Model
+	@Bindable
 	public static class LoginModel {
-		public IObservableValue<String> loginName = observe().value("");
-		public IObservableValue<String> password = observe().value("");
-		public IObservableValue<Boolean> autologin = observe().value(Boolean.FALSE);
+		private IObservableValue<String> loginName = observe().value("");
+		private IObservableValue<String> password = observe().value("");
+		private IObservableValue<Boolean> autologin = observe().value(false);
 	}
 }

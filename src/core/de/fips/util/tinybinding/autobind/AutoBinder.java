@@ -21,133 +21,238 @@ THE SOFTWARE.
 */
 package de.fips.util.tinybinding.autobind;
 
-import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
-import static de.fips.util.tinybinding.Observables.observe;
-import static org.fest.reflect.util.Accessibles.setAccessible;
-import static org.fest.reflect.util.Accessibles.setAccessibleIgnoringExceptions;
+import static java.util.Arrays.asList;
+import static org.fest.reflect.core.Reflection.field;
+import static org.fest.reflect.util.Accessibles.*;
 
 import java.awt.Container;
-import java.lang.annotation.Annotation;
+import java.beans.BeanInfo;
+import java.beans.FeatureDescriptor;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.ref.Reference;
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import de.fips.util.tinybinding.Bindings;
 import de.fips.util.tinybinding.BindingContexts;
+import de.fips.util.tinybinding.Bindings;
 import de.fips.util.tinybinding.IBindingContext;
 import de.fips.util.tinybinding.IObservableValue;
+import de.fips.util.tinybinding.Observables;
+import de.fips.util.tinybinding.swing.SwingObservable;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 /**
- * Object that is capable of automatically binding {@link Form @Form}- and {@link Model @Model}-annotated objects.
+ * Object that is capable of automatically binding {@link Bindable @Bindable}- and
+ * {@link SwingBindable @SwingBindable}-annotated objects.
  * <p>
  * For example:
+ * 
  * <pre>
- * &#64;Form
  * class TestForm {
- *   public JTextArea     a = new JTextArea();
+ *   &#064;SwingBindable
+ *   public JTextArea a = new JTextArea();
+ *   &#064;SwingBindable
  *   public JToggleButton b = new JToggleButton();
- *   public JSpinner      c = new JSpinner();
+ *   &#064;SwingBindable
+ *   public JSpinner c = new JSpinner();
  * }
- *
- * &#64;Model
+ * 
+ * &#064;Bindable
  * class TestModel {
- *   public IObservableValue&lt;String&gt;  a = ObservableValue.nil();
+ *   public IObservableValue&lt;String&gt; a = ObservableValue.nil();
  *   public IObservableValue&lt;Boolean&gt; b = ObservableValue.nil();
- *   public IObservableValue&lt;Double&gt;  c = ObservableValue.nil();
+ *   public IObservableValue&lt;Double&gt; c = ObservableValue.nil();
  * }
  * </pre>
- * <p>
- * Follow this checklist, if you want it to work:
- * <ol>
- * <li>annotate model class with {@code @Model},</li>
- * <li>annotate form class with {@code @Form},</li>
- * <li>fields you want expose the {@link AutoBinder} should be {@code public} and</li>
- * <li>have the same name in model and form.</li>
- * </ol>
- *
+ * 
  * @author Philipp Eichhorn
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AutoBinder {
-	/**
-	 * Binds the model and form objects.
-	 *
-	 * @param modelObject
-	 * @param formObject
-	 * @return The {@link BindingContext} used for the auto-bind.
-	 * @throws IllegalArgumentException
-	 * @throws NoSuchFieldException
-	 */
-	public static IBindingContext bind(final Object modelObject, final Object formObject) throws NoSuchFieldException {
-		final Class<?> modelClass = getAnnotatedClass(modelObject, "modelObject", Model.class);
-		final Class<?> formClass = getAnnotatedClass(formObject, "formObject", Form.class);
 
+	public static IBindingContext bind(final Object pojoA, final Object pojoB) throws NoSuchFieldException {
+		return new AutoBinder().bindPojo(pojoA, pojoB);
+	}
+
+	private IBindingContext bindPojo(final Object pojoA, final Object pojoB) throws NoSuchFieldException {
+		verifyNotNull(pojoA, "pojoA");
+		verifyNotNull(pojoB, "pojoB");
+		final Map<String, BindingData> bindingsA = bindableFieldsOf(pojoA);
+		final Map<String, BindingData> bindingsB = bindableFieldsOf(pojoB);
 		final IBindingContext context = BindingContexts.defaultContext();
-		for (final Field modelField : modelClass.getFields()) {
-			final Class<?> observedModelClass = getObservedClass(modelField);
-			if (observedModelClass == null) continue; // as we care for nothing else
+		for (final BindingData bindingA : bindingsA.values()) {
+			final BindingData bindingB = bindingsB.get(bindingA.getName());
+			if (bindingB == null) continue;
 
-			final Field formField = formClass.getField(modelField.getName());
-			final boolean accessible = formField.isAccessible();
-			try {
-				setAccessible(formField, true);
-				final Object formElement = formField.get(formObject);
-				if (formElement instanceof Container) {
-					final Object modelValue = modelField.get(modelObject);
-					doBind(context, observedModelClass, (Container)formElement, (IObservableValue<?>)modelValue);
-				}
-			} catch (IllegalArgumentException ignore) {
-				// ignore
-			} catch (IllegalAccessException ignore) {
-				// ignore
-			} finally {
-				setAccessibleIgnoringExceptions(formField, accessible);
-			}
+			final IObservableValue<?> observableValueA = observableValueFor(pojoA, bindingA);
+			final IObservableValue<?> observableValueB = observableValueFor(pojoB, bindingB);
+
+			Bindings.bind(observableValueA).to(observableValueB).in(context);
+			bindingA.setComplete(true);
+			bindingB.setComplete(true);
 		}
+		validate(pojoA, pojoB, bindingsA.values(), bindingsB.values());
 		return context;
 	}
-	private static void doBind(final IBindingContext context, final Class<?> observedModelClass, final Container element, final IObservableValue<?> value) {
-		if (String.class == observedModelClass) {
-			final IObservableValue<String> stringValue = uncheckedCast(value);
-			Bindings.bind(stringValue).to(observe(element).text()).in(context);
-		} else if (Boolean.class == observedModelClass) {
-			final IObservableValue<Boolean> booleanValue = uncheckedCast(value);
-			Bindings.bind(booleanValue).to(observe(element).selected()).in(context);
-		} else {
-			Bindings.bind(value).to(observe(element).value()).in(context);
+
+	private IObservableValue<?> observableValueFor(final Object pojo, final BindingData binding) throws NoSuchFieldException {
+		final Field field = binding.getField();
+		final boolean accessible = field.isAccessible();
+		try {
+			setAccessible(field, true);
+			final Class<?> type = field.getType();
+			final IObservableValue<?> observableValue;
+			if (IObservableValue.class.isAssignableFrom(type)) {
+				observableValue = (IObservableValue<?>) field.get(pojo);
+			} else if (Container.class.isAssignableFrom(type)) {
+				observableValue = (IObservableValue<?>) SwingObservable.class.getMethod(binding.hint).invoke(Observables.observe((Container) field.get(pojo)));
+			} else {
+				observableValue = Observables.observe(pojo).property(field.getName(), type);
+			}
+			return observableValue;
+		} catch (Exception ignore) {
+			throw new NoSuchFieldException();
+		} finally {
+			setAccessibleIgnoringExceptions(field, accessible);
 		}
 	}
 
-	private static Class<?> getObservedClass(final Field field) {
-		if (field.getGenericType() instanceof ParameterizedType) {
-			final ParameterizedType type = (ParameterizedType) field.getGenericType();
-			if (IObservableValue.class.isAssignableFrom((Class<?>) type.getRawType())) {
-				return (Class<?>) type.getActualTypeArguments()[0];
+	private Map<String, BindingData> bindableFieldsOf(final Object pojo) {
+		final Map<String, BindingData> bindableFields = new HashMap<String, BindingData>();
+		final Class<?> type = pojo.getClass();
+		BeanInfo beanInfo = null;
+		try {
+			beanInfo = Introspector.getBeanInfo(type, Object.class);
+		} catch (IntrospectionException e) {
+			throw new IllegalStateException(e);
+		}
+		final PropertyDescriptor[] descriptors = beanInfo.getPropertyDescriptors();
+		for (PropertyDescriptor descriptor : descriptors) {
+			final Class<?> declaringType = getDeclaringClass(descriptor);
+			if (declaringType == null) continue;
+			final boolean bindAllFields = declaringType.isAnnotationPresent(Bindable.class);
+			final Field field = getDeclaredField(declaringType, descriptor.getName());
+			if (field == null) continue;
+			BindingData data = null;
+			if (Container.class.isAssignableFrom(field.getType())) {
+				data = swingBindableFieldFor(field, bindAllFields);
+			} else {
+				data = bindableFieldFor(field, bindAllFields);
+			}
+			if (data == null) continue;
+			if (bindableFields.put(data.getName(), data) != null) {
+				throw invalid("The field name '%s' is used more than once.", data.getName());
 			}
 		}
-		return null;
+		final boolean bindAllFields = type.isAnnotationPresent(Bindable.class);
+		for (Field field : type.getDeclaredFields()) {
+			BindingData data = null;
+			if (Container.class.isAssignableFrom(field.getType())) {
+				data = swingBindableFieldFor(field, bindAllFields);
+			} else {
+				data = bindableFieldFor(field, bindAllFields);
+			}
+			if (data == null) continue;
+			if (bindableFields.containsKey(data.getName())) continue;
+			bindableFields.put(data.getName(), data);
+		}
+		
+		return bindableFields;
+	}
+	
+	private Class<?> getDeclaringClass(final PropertyDescriptor descriptor) {
+		final Field refClassField = getDeclaredField(FeatureDescriptor.class, "classRef");
+		if (refClassField == null) return null;
+		final boolean accessible = refClassField.isAccessible();
+		try {
+			setAccessible(refClassField, true);
+			final Reference<?> refClass = field("classRef").ofType(Reference.class).in(descriptor).get();
+			return (refClass == null) ? null : (Class<?>)refClass.get();
+		} finally {
+			setAccessibleIgnoringExceptions(refClassField, accessible);
+		}
+	}
+	
+	private Field getDeclaredField(final Class<?> type, final String fieldName) {
+		try {
+			return type.getDeclaredField(fieldName);
+		} catch (NoSuchFieldException e) {
+			return null;
+		}
 	}
 
-	private static <ANNOTATION extends Annotation> Class<?> getAnnotatedClass(final Object object, final String objectName, final Class<ANNOTATION> annotationClazz) {
-		verifyNotNull(object, objectName);
-		Class<?> clazz = object.getClass();
-		verifyClassIsAnnotatedWith(clazz, annotationClazz);
-		return clazz;
+	private BindingData bindableFieldFor(final Field field, final boolean bindAllFields) {
+		final Bindable bindable = field.getAnnotation(Bindable.class);
+		if ((bindable == null) && !bindAllFields) return null;
+		final String name = ((bindable == null) || bindable.name().isEmpty()) ? field.getName() : bindable.name();
+		return new BindingData(field, name, null);
+	}
+	
+	private BindingData swingBindableFieldFor(final Field field, final boolean bindAllFields) {
+		final SwingBindable swingBindable = field.getAnnotation(SwingBindable.class);
+		if (swingBindable == null) {
+			if (bindAllFields || field.isAnnotationPresent(Bindable.class)) {
+				throw invalid("Field '%s' should be annotated with @%s.", field, SwingBindable.class.getSimpleName());
+			}
+			return null;
+		}
+		final String name = (swingBindable.name().isEmpty()) ? field.getName() : swingBindable.name();
+		final String hint = swingBindable.hint();
+		sanatizeHint(field, hint);
+		return new BindingData(field, name, hint);
+	}
+	
+	private void sanatizeHint(final Field field, final String hint) {
+		final List<String> validHints = asList("background", "bounds", "editable", "enabled", "selected", "focus", "foreground", "title", "text", "tooltip", "value");
+		if (!validHints.contains(hint)) {
+			throw invalid("Invalid hint '%s' used for field '%s'.\nOnly the following hints are allowed:\n\t%s", hint, field, validHints);
+		}
 	}
 
-	private static void verifyNotNull(final Object object, final String objectName) {
+	private void validate(final Object pojoA, final Object pojoB, final Collection<BindingData> bindingsA, final Collection<BindingData> bindingsB) throws NoSuchFieldException {
+
+		final StringBuilder builder = new StringBuilder();
+		for (final BindingData binding : bindingsA) {
+			if (binding.isComplete()) continue;
+			builder.append("\t").append(binding.getField().getName()).append(" - ???\n");
+		}
+		for (final BindingData binding : bindingsB) {
+			if (binding.isComplete()) continue;
+			builder.append("\t??? - ").append(binding.getField().getName()).append("\n");
+		}
+		if (builder.length() > 0) {
+			builder.insert(0, "\n").insert(0,pojoB.getClass().getName()).insert(0, " - ").insert(0,pojoA.getClass().getName());
+			builder.insert(0,"unresolved bingings:\n\n\t");
+			throw new NoSuchFieldException(builder.toString());
+		}
+	}
+
+	private void verifyNotNull(final Object object, final String objectName) {
 		if (object == null)
 			throw invalid("'%s' may not be null.", objectName);
 	}
 
-	private static <ANNOTATION extends Annotation> void verifyClassIsAnnotatedWith(final Class<?> clazz, final Class<ANNOTATION> annotationClazz) {
-		if (clazz.getAnnotation(annotationClazz) == null)
-			throw invalid("'%s' needs to be annotated with '@%s'.", clazz.getName(), annotationClazz.getName());
+	private IllegalArgumentException invalid(final String message, final Object... args) {
+		return new IllegalArgumentException(String.format(message, args));
 	}
 
-	private static IllegalArgumentException invalid(final String message, final Object... args) {
-		return new IllegalArgumentException(String.format(message, args));
+	@Getter
+	@RequiredArgsConstructor
+	private static class BindingData {
+		private final Field field;
+		private final String name;
+		private final String hint;
+		@Setter
+		private boolean complete;
 	}
 }

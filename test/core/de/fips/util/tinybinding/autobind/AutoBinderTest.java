@@ -26,22 +26,24 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import de.fips.util.tinybinding.ExpectedException;
 import de.fips.util.tinybinding.IBindingContext;
 import de.fips.util.tinybinding.IObservableValue;
 import de.fips.util.tinybinding.autobind.AutoBinder;
-import de.fips.util.tinybinding.autobind.Form;
-import de.fips.util.tinybinding.autobind.Model;
+import de.fips.util.tinybinding.junit.ExpectedException;
 
 /**
  * Tests the {@link AutoBinder}.
@@ -54,16 +56,22 @@ public class AutoBinderTest {
 
 	private TestModel model;
 	private TestModel2 model2;
+	private TestModel3 model3;
 	private TestForm form;
 	private TestForm2 form2;
+	private TestForm3 form3;
+	private TestForm4 form4;
 	private IBindingContext context;
 
 	@Before
 	public void setUp() {
 		model = new TestModel();
 		model2 = new TestModel2();
+		model3 = new TestModel3();
 		form = new TestForm();
 		form2 = new TestForm2();
+		form3 = new TestForm3();
+		form4 = new TestForm4();
 	}
 
 	@After
@@ -74,85 +82,142 @@ public class AutoBinderTest {
 	}
 
 	@Test
-	public void test_bind() throws NoSuchFieldException {
+	public void test_bind() throws Exception {
 		context = AutoBinder.bind(model, form);
-		form.text.setText("All new input");
-		assertThat(model.text.get()).isEqualTo("All new input");
-		model.status.set(Boolean.TRUE);
-		assertThat(form.status.isSelected()).isTrue();
+		form.getText().setText("All new input");
+		assertThat(model.getText().get()).isEqualTo("All new input");
+		model.getStatus().set(Boolean.TRUE);
+		assertThat(form.getStatus().isSelected()).isTrue();
 	}
 
 	@Test
-	public void test_bind_subclassing() throws NoSuchFieldException {
+	public void test_bind_pojo() throws Exception {
+		context = AutoBinder.bind(model3, form);
+		form.getText().setText("All new input");
+		form.getStatus().setSelected(true);
+		assertThat(model3.getText()).isEqualTo("All new input");
+		assertThat(model3.getStatus()).isTrue();
+	}
+
+	@Test
+	public void test_bind_subclassing() throws Exception {
 		context = AutoBinder.bind(model2, form2);
-		form2.text.setText("All new input");
-		assertThat(model2.text.get()).isEqualTo("All new input");
-		model2.status.set(Boolean.TRUE);
-		assertThat(form2.status.isSelected()).isTrue();
-		model2.value.set(new Double(33.3));
-		assertThat((Double)form2.value.getValue()).isEqualTo(33.3);
+		form2.getText().setText("All new input");
+		assertThat(model2.getText().get()).isEqualTo("All new input");
+		model2.getStatus().set(Boolean.TRUE);
+		assertThat(form2.getStatus().isSelected()).isTrue();
+		model2.getValue().set(new Double(33.3));
+		assertThat((Double)form2.getValue().getValue()).isEqualTo(33.3);
 	}
 
 	@Test
 	public void test_bind_missingFormField() throws Exception {
-		thrown.expect(NoSuchFieldException.class);
+		thrown.expectNoSuchFieldException("unresolved bingings:\n" + //
+				"\n" + //
+				"\tde.fips.util.tinybinding.autobind.AutoBinderTest$TestModel2 - de.fips.util.tinybinding.autobind.AutoBinderTest$TestForm\n" + //
+				"\tvalue - ???");
 		context = AutoBinder.bind(model2, form);
 	}
 
 	@Test
-	public void test_bind_extraFormField() throws NoSuchFieldException {
+	public void test_bind_missingModelField() throws Exception {
+		thrown.expectNoSuchFieldException("unresolved bingings:\n" + //
+				"\n" + //
+				"\tde.fips.util.tinybinding.autobind.AutoBinderTest$TestModel - de.fips.util.tinybinding.autobind.AutoBinderTest$TestForm2\n" + //
+				"\t??? - value");
 		context = AutoBinder.bind(model, form2);
-		form2.text.setText("All new input");
-		assertThat(model.text.get()).isEqualTo("All new input");
-		model.status.set(Boolean.TRUE);
-		assertThat(form2.status.isSelected()).isTrue();
 	}
 
 	@Test
-	public void test_bind_nullValues1() throws NoSuchFieldException {
-		thrown.expectIllegalArgumentException("'modelObject' may not be null.");
+	public void test_bind_modelIsNull() throws Exception {
+		thrown.expectIllegalArgumentException("'pojoA' may not be null.");
 		context = AutoBinder.bind(null, form2);
 	}
 
 	@Test
-	public void test_bind_nullValues2() throws NoSuchFieldException {
-		thrown.expectIllegalArgumentException("'formObject' may not be null.");
+	public void test_bind_formIsNull() throws Exception {
+		thrown.expectIllegalArgumentException("'pojoB' may not be null.");
 		context = AutoBinder.bind(model, null);
 	}
 
 	@Test
-	public void test_bind_missingAnnotation1() throws NoSuchFieldException {
-		thrown.expectIllegalArgumentException("'java.lang.String' needs to be annotated with '@de.fips.util.tinybinding.autobind.Model'.");
+	public void test_bind_missingAnnotation1() throws Exception {
+		thrown.expectNoSuchFieldException("unresolved bingings:\n" + //
+				"\n" + //
+				"\tjava.lang.String - de.fips.util.tinybinding.autobind.AutoBinderTest$TestForm2\n" + //
+				"\t??? - text\n" + //
+				"\t??? - status\n" + //
+				"\t??? - value");
 		context = AutoBinder.bind("", form2);
 	}
 
 	@Test
-	public void test_bind_missingAnnotation2() throws NoSuchFieldException {
-		thrown.expectIllegalArgumentException("'java.lang.String' needs to be annotated with '@de.fips.util.tinybinding.autobind.Form'.");
+	public void test_bind_missingAnnotation2() throws Exception {
+		thrown.expectNoSuchFieldException("unresolved bingings:\n" + //
+				"\n" + //
+				"\tde.fips.util.tinybinding.autobind.AutoBinderTest$TestModel - java.lang.String\n" + //
+				"\ttext - ???\n" + //
+				"\tstatus - ???");
 		context = AutoBinder.bind(model, "");
 	}
 
-	@Model
+	@Test
+	public void test_bind_unknownHint() throws Exception {
+		thrown.expectIllegalArgumentException("Invalid hint 'unknownHint' used for field 'private javax.swing.JButton de.fips.util.tinybinding.autobind.AutoBinderTest$TestForm3.button'.\n" + //
+				"Only the following hints are allowed:\n" + //
+				"\t[background, bounds, editable, enabled, selected, focus, foreground, title, text, tooltip, value]");
+		context = AutoBinder.bind(model, form3);
+	}
+
+	@Test
+	public void test_bind_notSwingBinding() throws Exception {
+		thrown.expectIllegalArgumentException("Field 'private javax.swing.JButton de.fips.util.tinybinding.autobind.AutoBinderTest$TestForm4.button' should be annotated with @SwingBindable.");
+		context = AutoBinder.bind(model, form4);
+	}
+
+	@Bindable @Getter @Setter
 	public static class TestModel {
-		public IObservableValue<String> text = observe().nil();
-		public IObservableValue<Boolean> status = observe().nil();
+		private IObservableValue<String> text = observe().nil();
+		private IObservableValue<Boolean> status = observe().nil();
 	}
 
-	@Model
+	@Getter @Setter
 	public static class TestModel2 extends TestModel {
-		public String ignoredField1;
-		public List<String> ignoredField2;
-		public IObservableValue<Double> value = observe().value(new Double(0.0));
+		private String ignoredField1;
+		private List<String> ignoredField2;
+		@Bindable
+		private IObservableValue<Double> value = observe().value(new Double(0.0));
 	}
 
-	@Form
+	@Bindable @Getter @Setter
+	public static class TestModel3 {
+		private String text;
+		private Boolean status;
+	}
+
+	@Getter
 	public static class TestForm {
-		public JTextArea text = new JTextArea();
-		public JToggleButton status = new JToggleButton();
+		@SwingBindable(hint="text")
+		private JTextArea text = new JTextArea();
+		@SwingBindable(hint="selected")
+		private JToggleButton status = new JToggleButton();
 	}
 
-	@Form
+	@Getter
 	public static class TestForm2 extends TestForm {
-		public JSpinner value = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 1.0));
+		@SwingBindable(hint="value")
+		private JSpinner value = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 100.0, 1.0));
+	}
+
+	@Getter
+	public static class TestForm3 extends TestForm {
+		@SwingBindable(hint="unknownHint")
+		private JButton button = new JButton();
+	}
+
+	@Getter
+	public static class TestForm4 extends TestForm {
+		@Bindable
+		private JButton button = new JButton();
 	}
 }

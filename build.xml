@@ -97,12 +97,13 @@ the common tasks and can be called on to run the main aspects of all the sub-scr
   <!-- dist -->
   <target name="dist" description="Builds THE tinybinding.jar file which contains everything." depends="compile">
     <mkdir dir="dist" />
-  	<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/build/jarjar.jar" />
+    <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/build/jarjar.jar" />
     <jarjar destfile="dist/tinybinding.jar">
       <fileset dir="build/tinybinding" />
       <zipfileset src="lib/build/fest-reflect.jar">
         <exclude name="**/constructor/**" />
-        <exclude name="**/field/**" />
+        <exclude name="**/field/*StaticField*" />
+        <exclude name="**/method/*StaticMethod*" />
         <exclude name="**/innerclass/**" />
       </zipfileset>
       <zipfileset src="lib/build/fest-util.jar">
