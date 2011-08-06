@@ -156,6 +156,8 @@ public final class AutoBinder {
 		}
 		final boolean bindAllFields = type.isAnnotationPresent(Bindable.class);
 		for (Field field : type.getDeclaredFields()) {
+			if (field.getName().startsWith("$")) continue;
+			if (field.getName().equals("serialVersionUID")) continue;
 			BindingData data = null;
 			if (Container.class.isAssignableFrom(field.getType())) {
 				data = swingBindableFieldFor(field, bindAllFields);
