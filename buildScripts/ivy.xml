@@ -13,7 +13,7 @@
     <dependency org="org.easytesting" name="fest-assert" rev="1.4" conf="test->default; contrib->sources" transitive="false" />
     <dependency org="abbot" name="abbot" rev="1.0.2" conf="test->default" />
    
-    <dependency org="com.github.peichhorn" name="lombok-pg" rev="0.10.4-SNAPSHOT">
+    <dependency org="com.github.peichhorn" name="lombok-pg" rev="0.10.4">
         <artifact name="lombok-pg" conf="default" />
         <artifact name="lombok-pg" conf="runtime" m:classifier="runtime" />
     </dependency>
