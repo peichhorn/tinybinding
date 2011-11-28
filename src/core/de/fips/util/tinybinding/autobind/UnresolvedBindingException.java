@@ -21,21 +21,30 @@
  */
 package de.fips.util.tinybinding.autobind;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * Used on a field it indicates that the annotated field can be bound to
- * another field with the same name or field-name and the same type. * 
  * 
- * @see AutoBinder#bind(Object, Object)
  * @author Philipp Eichhorn
  */
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface SwingBindable {
-	String name() default "";
-	String hint();
+public class UnresolvedBindingException extends Exception {
+	private static final long serialVersionUID = 4600777691375193596L;
+
+	/**
+	 * Constructs with a specified cause.
+	 * 
+	 * @param cause
+	 *            the cause.
+	 */
+	public UnresolvedBindingException(Throwable t) {
+		super(t);
+	}
+
+	/**
+	 * Constructor with a detail message.
+	 * 
+	 * @param s
+	 *            the detail message
+	 */
+	public UnresolvedBindingException(String s) {
+		super(s);
+	}
 }

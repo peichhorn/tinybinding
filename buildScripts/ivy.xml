@@ -8,18 +8,16 @@
     <conf name="contrib" />
   </configurations>
   <dependencies>
-    <dependency org="junit" name="junit" rev="4.8.2" conf="test->default; contrib->sources" />
+    <dependency org="junit" name="junit" rev="4.10" conf="test->default; contrib->sources" />
     <dependency org="org.mockito" name="mockito-all" rev="1.8.5" conf="test->default; contrib->sources" />
-    <dependency org="org.easytesting" name="fest-assert" rev="1.4" conf="test->default; contrib->sources" transitive="false" />
+    <dependency org="org.easytesting" name="fest-assert" rev="1.2" conf="test->default; contrib->sources" transitive="false" />
     <dependency org="abbot" name="abbot" rev="1.0.2" conf="test->default" />
-   
-    <dependency org="com.github.peichhorn" name="lombok-pg" rev="0.10.4">
-        <artifact name="lombok-pg" conf="default" />
-        <artifact name="lombok-pg" conf="runtime" m:classifier="runtime" />
-    </dependency>
-   
+    
+    <dependency org="com.github.peichhorn" name="lombok-pg" rev="0.10.4" conf="build->default" />
+    
     <dependency org="org.easytesting" name="fest-util" rev="1.1.6" conf="build->default; contrib->sources" transitive="false" />
     <dependency org="org.easytesting" name="fest-reflect" rev="1.2" conf="build->default; contrib->sources" transitive="false" />
+    <dependency org="org.easytesting" name="fest-swing" rev="1.2" conf="build->default; contrib->sources" transitive="false" />
     <dependency org="com.googlecode.jarjar" name="jarjar" rev="1.1" conf="build->default" />
   </dependencies>
 </ivy-module>

@@ -1,27 +1,26 @@
 /*
-Copyright © 2010-2011 Philipp Eichhorn.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
+ * Copyright © 2010-2011 Philipp Eichhorn.
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package de.fips.util.tinybinding;
 
-import static de.fips.util.tinybinding.Observables.observe;
 import static javax.swing.JOptionPane.*;
 import static lombok.With.with;
 
@@ -43,23 +42,25 @@ import de.fips.util.tinybinding.autobind.Bindable;
 import de.fips.util.tinybinding.autobind.SwingBindable;
 
 import lombok.Application;
+import lombok.BoundPropertySupport;
+import lombok.BoundSetter;
+import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.SwingInvokeLater;
 
 public class SimpleDemo implements Application {
 
+	@SneakyThrows
 	@SwingInvokeLater
 	public void runApp(final String[] params) {
 		final LoginForm form = new LoginForm();
 		final LoginModel model = new LoginModel();
-		try {
-			AutoBinder.bind(model, form);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		AutoBinder.bind(model, form);
 		with(new JFrame("Simple Demo"),
 			setLayout(new BorderLayout()),
 			getContentPane().add(form, BorderLayout.CENTER),
 			getContentPane().add(new JButton(new LoginAction(model)), BorderLayout.SOUTH),
+			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE),
 			pack(),
 			setResizable(false),
 			setVisible(true));
@@ -77,8 +78,8 @@ public class SimpleDemo implements Application {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			if ("user".equals(model.loginName.get()) && "1234".equals(model.password.get())) {
-				if (model.autologin.get()) {
+			if ("user".equals(model.getLoginName()) && "1234".equals(model.getPassword())) {
+				if (model.getAutologin()) {
 					showMessageDialog(null, "Login succeed - Auto Login active", "Success", INFORMATION_MESSAGE);
 				} else {
 					showMessageDialog(null, "Login succeed", "Success", INFORMATION_MESSAGE);
@@ -110,10 +111,14 @@ public class SimpleDemo implements Application {
 		}
 	}
 
-	@Bindable
+	@BoundSetter @Getter
+	@BoundPropertySupport
 	public static class LoginModel {
-		private IObservableValue<String> loginName = observe().value("");
-		private IObservableValue<String> password = observe().value("");
-		private IObservableValue<Boolean> autologin = observe().value(false);
+		@Bindable
+		private String loginName = "";
+		@Bindable
+		private String password = "";
+		@Bindable
+		private Boolean autologin = false;
 	}
 }

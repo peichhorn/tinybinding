@@ -19,37 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.fips.util.tinybinding.impl;
+package de.fips.util.tinybinding;
 
-import static org.fest.assertions.Assertions.assertThat;
+import de.fips.util.tinybinding.weaklistener.WeakListenerWithType;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
-import de.fips.util.tinybinding.impl.Converter;
-import de.fips.util.tinybinding.junit.ExpectedException;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
- * Tests {@link Converter}.
+ *
+ * @see java.lang.ref.WeakReference WeakReferences
+ * @author Philipp Eichhorn
  */
-@RunWith(JUnit4.class)
-public class ConverterTest {
-	@Rule
-	public final ExpectedException thrown = ExpectedException.none();
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class WeakListeners {
 
-	@Test
-	public void test_convert() {
-		Converter<Integer, Number> converter = new Converter<Integer, Number>();
-		Number num = converter.convert(Integer.valueOf(10));
-		assertThat(num).isNotNull();
-	}
-
-	@Test
-	public void test_convert_invalidType() {
-		Converter<Integer, String> converter = new Converter<Integer, String>();
-		thrown.expect(ClassCastException.class);
-		System.out.println(converter.convert(Integer.valueOf(10)));
+	public static <LISTENER_TYPE, TYPE extends LISTENER_TYPE> WeakListenerWithType<LISTENER_TYPE, TYPE> addWeak(final Class<LISTENER_TYPE> listenerType, final TYPE listener) {
+		return new WeakListenerWithType<LISTENER_TYPE, TYPE>(listenerType, listener);
 	}
 }

@@ -1,37 +1,30 @@
 /*
-Copyright © 2010-2011 Philipp Eichhorn.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
+ * Copyright © 2010-2011 Philipp Eichhorn.
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package de.fips.util.tinybinding.autobind;
 
 import static java.util.Arrays.asList;
-import static org.fest.reflect.core.Reflection.field;
 import static org.fest.reflect.util.Accessibles.*;
 
 import java.awt.Container;
-import java.beans.BeanInfo;
-import java.beans.FeatureDescriptor;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.ref.Reference;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,11 +52,11 @@ import lombok.Setter;
  * 
  * <pre>
  * class TestForm {
- *   &#064;SwingBindable
+ *   &#064;SwingBindable(hint="text")
  *   public JTextArea a = new JTextArea();
- *   &#064;SwingBindable
+ *   &#064;SwingBindable(hint="selected")
  *   public JToggleButton b = new JToggleButton();
- *   &#064;SwingBindable
+ *   &#064;SwingBindable(hint="value")
  *   public JSpinner c = new JSpinner();
  * }
  * 
@@ -80,11 +73,11 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AutoBinder {
 
-	public static IBindingContext bind(final Object pojoA, final Object pojoB) throws NoSuchFieldException {
+	public static IBindingContext bind(final Object pojoA, final Object pojoB) throws UnresolvedBindingException {
 		return new AutoBinder().bindPojo(pojoA, pojoB);
 	}
 
-	private IBindingContext bindPojo(final Object pojoA, final Object pojoB) throws NoSuchFieldException {
+	private IBindingContext bindPojo(final Object pojoA, final Object pojoB) throws UnresolvedBindingException {
 		verifyNotNull(pojoA, "pojoA");
 		verifyNotNull(pojoB, "pojoB");
 		final Map<String, BindingData> bindingsA = bindableFieldsOf(pojoA);
@@ -93,10 +86,8 @@ public final class AutoBinder {
 		for (final BindingData bindingA : bindingsA.values()) {
 			final BindingData bindingB = bindingsB.get(bindingA.getName());
 			if (bindingB == null) continue;
-
 			final IObservableValue<?> observableValueA = observableValueFor(pojoA, bindingA);
 			final IObservableValue<?> observableValueB = observableValueFor(pojoB, bindingB);
-
 			Bindings.bind(observableValueA).to(observableValueB).in(context);
 			bindingA.setComplete(true);
 			bindingB.setComplete(true);
@@ -105,7 +96,7 @@ public final class AutoBinder {
 		return context;
 	}
 
-	private IObservableValue<?> observableValueFor(final Object pojo, final BindingData binding) throws NoSuchFieldException {
+	private IObservableValue<?> observableValueFor(final Object pojo, final BindingData binding) throws UnresolvedBindingException {
 		final Field field = binding.getField();
 		final boolean accessible = field.isAccessible();
 		try {
@@ -120,8 +111,8 @@ public final class AutoBinder {
 				observableValue = Observables.observe(pojo).property(field.getName(), type);
 			}
 			return observableValue;
-		} catch (Exception ignore) {
-			throw new NoSuchFieldException();
+		} catch (Exception e) {
+			throw new UnresolvedBindingException(e);
 		} finally {
 			setAccessibleIgnoringExceptions(field, accessible);
 		}
@@ -129,114 +120,69 @@ public final class AutoBinder {
 
 	private Map<String, BindingData> bindableFieldsOf(final Object pojo) {
 		final Map<String, BindingData> bindableFields = new HashMap<String, BindingData>();
-		final Class<?> type = pojo.getClass();
-		BeanInfo beanInfo = null;
-		try {
-			beanInfo = Introspector.getBeanInfo(type, Object.class);
-		} catch (IntrospectionException e) {
-			throw new IllegalStateException(e);
-		}
-		final PropertyDescriptor[] descriptors = beanInfo.getPropertyDescriptors();
-		for (PropertyDescriptor descriptor : descriptors) {
-			final Class<?> declaringType = getDeclaringClass(descriptor);
-			if (declaringType == null) continue;
-			final boolean bindAllFields = declaringType.isAnnotationPresent(Bindable.class);
-			final Field field = getDeclaredField(declaringType, descriptor.getName());
-			if (field == null) continue;
-			BindingData data = null;
-			if (Container.class.isAssignableFrom(field.getType())) {
-				data = swingBindableFieldFor(field, bindAllFields);
-			} else {
-				data = bindableFieldFor(field, bindAllFields);
-			}
-			if (data == null) continue;
-			if (bindableFields.put(data.getName(), data) != null) {
-				throw invalid("The field name '%s' is used more than once.", data.getName());
-			}
-		}
-		final boolean bindAllFields = type.isAnnotationPresent(Bindable.class);
-		for (Field field : type.getDeclaredFields()) {
-			if (field.getName().startsWith("$")) continue;
-			if (field.getName().equals("serialVersionUID")) continue;
-			BindingData data = null;
-			if (Container.class.isAssignableFrom(field.getType())) {
-				data = swingBindableFieldFor(field, bindAllFields);
-			} else {
-				data = bindableFieldFor(field, bindAllFields);
-			}
-			if (data == null) continue;
-			if (bindableFields.containsKey(data.getName())) continue;
-			bindableFields.put(data.getName(), data);
-		}
-		
+		fillBindableFields(pojo.getClass(), bindableFields);
 		return bindableFields;
 	}
-	
-	private Class<?> getDeclaringClass(final PropertyDescriptor descriptor) {
-		final Field refClassField = getDeclaredField(FeatureDescriptor.class, "classRef");
-		if (refClassField == null) return null;
-		final boolean accessible = refClassField.isAccessible();
-		try {
-			setAccessible(refClassField, true);
-			final Reference<?> refClass = field("classRef").ofType(Reference.class).in(descriptor).get();
-			return (refClass == null) ? null : (Class<?>)refClass.get();
-		} finally {
-			setAccessibleIgnoringExceptions(refClassField, accessible);
+
+	private void fillBindableFields(final Class<?> type, final Map<String, BindingData> bindableFields) {
+		for (Field field : type.getDeclaredFields()) { 
+			final BindingData data;
+			if (field.isAnnotationPresent(SwingBindable.class)) {
+				data = swingBindableFieldFor(field);
+			} else if (field.isAnnotationPresent(Bindable.class)) {
+				if (Container.class.isAssignableFrom(field.getType())) {
+					throw invalid("Field '%s' should be annotated with @%s.", field, SwingBindable.class.getSimpleName());
+				}
+				data = bindableFieldFor(field);
+			} else {
+				continue;
+			}
+			bindableFields.put(data.getName(), data);
 		}
-	}
-	
-	private Field getDeclaredField(final Class<?> type, final String fieldName) {
-		try {
-			return type.getDeclaredField(fieldName);
-		} catch (NoSuchFieldException e) {
-			return null;
+		final Class<?> superType = type.getSuperclass();
+		if (superType != null) {
+			fillBindableFields(superType, bindableFields);
 		}
 	}
 
-	private BindingData bindableFieldFor(final Field field, final boolean bindAllFields) {
+	private BindingData bindableFieldFor(final Field field) {
 		final Bindable bindable = field.getAnnotation(Bindable.class);
-		if ((bindable == null) && !bindAllFields) return null;
-		final String name = ((bindable == null) || bindable.name().isEmpty()) ? field.getName() : bindable.name();
+		final String name = bindable.name().isEmpty() ? field.getName() : bindable.name();
 		return new BindingData(field, name, null);
 	}
-	
-	private BindingData swingBindableFieldFor(final Field field, final boolean bindAllFields) {
+
+	private BindingData swingBindableFieldFor(final Field field) {
 		final SwingBindable swingBindable = field.getAnnotation(SwingBindable.class);
-		if (swingBindable == null) {
-			if (bindAllFields || field.isAnnotationPresent(Bindable.class)) {
-				throw invalid("Field '%s' should be annotated with @%s.", field, SwingBindable.class.getSimpleName());
-			}
-			return null;
-		}
-		final String name = (swingBindable.name().isEmpty()) ? field.getName() : swingBindable.name();
+		final String name = swingBindable.name().isEmpty() ? field.getName() : swingBindable.name();
 		final String hint = swingBindable.hint();
-		sanatizeHint(field, hint);
-		return new BindingData(field, name, hint);
+		return new BindingData(field, name, sanatizeHint(field, hint));
 	}
-	
-	private void sanatizeHint(final Field field, final String hint) {
+
+	private String sanatizeHint(final Field field, final String hint) {
 		final List<String> validHints = asList("background", "bounds", "editable", "enabled", "selected", "focus", "foreground", "title", "text", "tooltip", "value");
-		if (!validHints.contains(hint)) {
-			throw invalid("Invalid hint '%s' used for field '%s'.\nOnly the following hints are allowed:\n\t%s", hint, field, validHints);
-		}
+		if (validHints.contains(hint)) return hint;
+		throw invalid("Invalid hint '%s' used for field '%s'.\nOnly the following hints are allowed:\n\t%s", hint, field, validHints);
 	}
 
-	private void validate(final Object pojoA, final Object pojoB, final Collection<BindingData> bindingsA, final Collection<BindingData> bindingsB) throws NoSuchFieldException {
-
+	private void validate(final Object pojoA, final Object pojoB, final Collection<BindingData> bindingsA, final Collection<BindingData> bindingsB) throws UnresolvedBindingException {
 		final StringBuilder builder = new StringBuilder();
 		for (final BindingData binding : bindingsA) {
 			if (binding.isComplete()) continue;
-			builder.append("\t").append(binding.getField().getName()).append(" - ???\n");
+			builder.append("\t").append(fieldSignature(binding.getField())).append(" - ???\n");
 		}
 		for (final BindingData binding : bindingsB) {
 			if (binding.isComplete()) continue;
-			builder.append("\t??? - ").append(binding.getField().getName()).append("\n");
+			builder.append("\t??? - ").append(fieldSignature(binding.getField())).append("\n");
 		}
 		if (builder.length() > 0) {
 			builder.insert(0, "\n").insert(0,pojoB.getClass().getName()).insert(0, " - ").insert(0,pojoA.getClass().getName());
 			builder.insert(0,"unresolved bingings:\n\n\t");
-			throw new NoSuchFieldException(builder.toString());
+			throw new UnresolvedBindingException(builder.toString());
 		}
+	}
+
+	private String fieldSignature(final Field field) {
+		return field.getType().getName() + " " + field.getName();
 	}
 
 	private void verifyNotNull(final Object object, final String objectName) {

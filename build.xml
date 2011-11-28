@@ -1,127 +1,132 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <project name="tinybinding" default="dist" xmlns:ivy="antlib:com.zwitserloot.ivyplusplus">
-  <description>
+	<description>
 This buildfile is part of tinybinding. It is the main entry point that contains
 the common tasks and can be called on to run the main aspects of all the sub-scripts.
   </description>
 
-  <property name="build.compiler" value="javac1.6" />
-  
-  <!-- resolve -->
-  <property name="ivy.retrieve.pattern" value="lib/[conf]/[artifact].[ext]" />
-  <available file="lib/ivyplusplus.jar" property="ivyplusplus.available" />
-  
-  <target name="download-ipp" unless="ivyplusplus.available">
-    <mkdir dir="lib" />
-    <get src="http://projectlombok.org/downloads/ivyplusplus.jar" dest="lib/ivyplusplus.jar" usetimestamp="true" />
-  </target>
+	<property name="build.compiler" value="javac1.6" />
 
-  <target name="ensure-ipp" depends="download-ipp">
-    <taskdef classpath="lib/ivyplusplus.jar" resource="com/zwitserloot/ivyplusplus/antlib.xml" uri="antlib:com.zwitserloot.ivyplusplus" />
-  </target>
+	<!-- resolve -->
+	<property name="ivy.retrieve.pattern" value="lib/[conf]/[artifact].[ext]" />
+	<available file="lib/ivyplusplus.jar" property="ivyplusplus.available" />
 
-  <target name="config-ivy" depends="ensure-ipp">
-    <ivy:configure file="buildScripts/ivysettings.xml" />
-  </target>
+	<target name="download-ipp" unless="ivyplusplus.available">
+		<mkdir dir="lib" />
+		<get src="http://projectlombok.org/downloads/ivyplusplus.jar" dest="lib/ivyplusplus.jar" usetimestamp="true" />
+	</target>
 
-  <target name="deps" depends="ensureBuildDeps, ensureRuntimeDeps, ensureTestDeps, ensureContribDeps" description="Downloads all dependencies." />
+	<target name="ensure-ipp" depends="download-ipp">
+		<taskdef classpath="lib/ivyplusplus.jar" resource="com/zwitserloot/ivyplusplus/antlib.xml" uri="antlib:com.zwitserloot.ivyplusplus" />
+	</target>
 
-  <target name="ensureBuildDeps" depends="config-ivy">
-    <ivy:resolve file="buildScripts/ivy.xml" refresh="true" conf="build" />
-    <ivy:retrieve />
-  </target>
+	<target name="config-ivy" depends="ensure-ipp">
+		<ivy:configure file="buildScripts/ivysettings.xml" />
+	</target>
 
-  <target name="ensureRuntimeDeps" depends="config-ivy">
-    <ivy:resolve file="buildScripts/ivy.xml" refresh="true" conf="runtime" />
-    <ivy:retrieve />
-  </target>
+	<target name="deps" depends="ensureBuildDeps, ensureRuntimeDeps, ensureTestDeps, ensureContribDeps" description="Downloads all dependencies." />
 
-  <target name="ensureTestDeps" depends="config-ivy">
-    <ivy:resolve file="buildScripts/ivy.xml" refresh="true" conf="test" />
-    <ivy:retrieve />
-  </target>
+	<target name="ensureBuildDeps" depends="config-ivy">
+		<ivy:resolve file="buildScripts/ivy.xml" refresh="true" conf="build" />
+		<ivy:retrieve />
+	</target>
 
-  <target name="ensureContribDeps" depends="config-ivy" description="Downloads various non-crucial documentation, sources, etc ">
-    <ivy:resolve file="buildScripts/ivy.xml" refresh="true" conf="contrib" />
-    <ivy:retrieve />
-  </target>
+	<target name="ensureRuntimeDeps" depends="config-ivy">
+		<ivy:resolve file="buildScripts/ivy.xml" refresh="true" conf="runtime" />
+		<ivy:retrieve />
+	</target>
 
-  <!-- IDE integration -->
-  <target name="eclipse" depends="deps" description="Creates eclipse project files and downloads all dependencies. Open this directory as project in eclipse after running this target.">
-    <ivy:eclipsegen source="1.6">
-      <srcdir dir="src/core" />
-      <srcdir dir="test/core" />
-      <conf name="build" sources="contrib" />
-      <conf name="test" sources="contrib" />
-      <settings>
-        <url url="http://cloud.github.com/downloads/peichhorn/tinybinding/tinybinding.eclipse.settings" />
-      </settings>
-    </ivy:eclipsegen>
-    
-    <copy
-        file="buildScripts/[tinybinding] clean + dist.template"
-        tofile="[tinybinding] clean + dist.launch"
-        preservelastmodified="true"
-        overwrite="true">
-    </copy>
-  </target>
+	<target name="ensureTestDeps" depends="config-ivy">
+		<ivy:resolve file="buildScripts/ivy.xml" refresh="true" conf="test" />
+		<ivy:retrieve />
+	</target>
 
-  <!-- clean -->
-  <target name="clean" description="Removes all generated files.">
-    <delete dir="build" quiet="true" />
-  </target>
-  
-  <target name="distclean" depends="clean" description="Deletes everything that this build script has ever generated.">
-    <delete dir="lib" quiet="true" />
-    <delete dir="dist" quiet="true" />
-    <delete file=".project" quiet="true" />
-    <delete file=".classpath" quiet="true" />
-    <delete dir=".settings" quiet="true" />
-  </target>
-  
-  <!-- compile -->
-  <path id="build.path">
-    <fileset dir="lib/build">
-      <include name="*.jar" />
-    </fileset>
-  </path>
-  
-  <target name="compile" depends="ensureBuildDeps" description="Compiles the code.">
-    <ivy:compile destdir="build/tinybinding" source="1.6" target="1.6" includeantruntime="false">
-      <src path="src/core" />
-      <classpath location="build/tinybinding" />
-      <classpath refid="build.path" />
-    </ivy:compile>
-  </target>
-  
-  <!-- dist -->
-  <target name="dist" description="Builds THE tinybinding.jar file which contains everything." depends="compile">
-    <mkdir dir="dist" />
-    <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/build/jarjar.jar" />
-    <jarjar destfile="dist/tinybinding.jar">
-      <fileset dir="build/tinybinding" />
-      <zipfileset src="lib/build/fest-reflect.jar">
-        <exclude name="**/constructor/**" />
-        <exclude name="**/field/*StaticField*" />
-        <exclude name="**/method/*StaticMethod*" />
-        <exclude name="**/innerclass/**" />
-      </zipfileset>
-      <zipfileset src="lib/build/fest-util.jar">
-        <include name="**/*Array*.class" />
-        <include name="**/*String*.class" />
-        <include name="**/*Object*.class" />
-      </zipfileset>
-        <rule pattern="org.fest.**" result="de.fips.util.tinybinding.lib.org.fest.@1" />
-      <fileset dir="." includes="LICENSE" />
-      <fileset dir="." includes="FEST_LICENSE" />
-    </jarjar>
-    <property name="tinybinding.dist.built" value="true" />
-  </target>
-  
-  <!-- test -->
-  <path id="test.path">
-    <fileset dir="lib/test">
-      <include name="*.jar" />
-    </fileset>
-  </path>
+	<target name="ensureContribDeps" depends="config-ivy" description="Downloads various non-crucial documentation, sources, etc ">
+		<ivy:resolve file="buildScripts/ivy.xml" refresh="true" conf="contrib" />
+		<ivy:retrieve />
+	</target>
+
+	<!-- IDE integration -->
+	<target name="eclipse" depends="deps" description="Creates eclipse project files and downloads all dependencies. Open this directory as project in eclipse after running this target.">
+		<ivy:eclipsegen source="1.6">
+			<srcdir dir="src/core" />
+			<srcdir dir="test/core" />
+			<conf name="build" sources="contrib" />
+			<conf name="test" sources="contrib" />
+			<settings>
+				<url url="http://cloud.github.com/downloads/peichhorn/tinybinding/tinybinding.eclipse.settings" />
+			</settings>
+		</ivy:eclipsegen>
+
+		<copy file="buildScripts/[tinybinding] clean + dist.template" tofile="[tinybinding] clean + dist.launch" preservelastmodified="true" overwrite="true">
+		</copy>
+	</target>
+
+	<!-- clean -->
+	<target name="clean" description="Removes all generated files.">
+		<delete dir="build" quiet="true" />
+	</target>
+
+	<target name="distclean" depends="clean" description="Deletes everything that this build script has ever generated.">
+		<delete dir="lib" quiet="true" />
+		<delete dir="dist" quiet="true" />
+		<delete file=".project" quiet="true" />
+		<delete file=".classpath" quiet="true" />
+		<delete dir=".settings" quiet="true" />
+	</target>
+
+	<!-- compile -->
+	<path id="build.path">
+		<fileset dir="lib/build">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="compile" depends="ensureBuildDeps" description="Compiles the code.">
+		<ivy:compile destdir="build/tinybinding" source="1.6" target="1.6" includeantruntime="false">
+			<src path="src/core" />
+			<classpath location="build/tinybinding" />
+			<classpath refid="build.path" />
+		</ivy:compile>
+	</target>
+
+	<!-- version -->
+	<target name="version" depends="ensure-ipp" description="Shows the version number." unless="tinybinding.version">
+		<mkdir dir="build/tinybinding" />
+		<javac includeDestClasses="false" srcdir="src/core" debug="on" destdir="build/tinybinding" source="1.6" target="1.6" includes="de/fips/util/tinybinding/Version.java" includeantruntime="false" />
+		<java classname="de.fips.util.tinybinding.Version" classpath="build/tinybinding" failonerror="true" output="build/version.txt" />
+		<ivy:loadversion property="tinybinding.version" file="build/version.txt" />
+		<echo level="info">tinybinding version: ${tinybinding.version}</echo>
+	</target>
+
+	<!-- dist -->
+	<target name="dist" description="Builds THE tinybinding.jar file which contains everything." depends="compile, version">
+		<mkdir dir="dist" />
+		<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/build/jarjar.jar" />
+		<jarjar destfile="dist/tinybinding.jar">
+			<fileset dir="build/tinybinding" />
+			<zipfileset src="lib/build/fest-reflect.jar">
+				<exclude name="**/constructor/**" />
+				<exclude name="**/field/*StaticField*" />
+				<exclude name="**/method/*StaticMethod*" />
+				<exclude name="**/innerclass/**" />
+			</zipfileset>
+			<zipfileset src="lib/build/fest-util.jar">
+				<include name="**/*Array*.class" />
+				<include name="**/*String*.class" />
+				<include name="**/*Object*.class" />
+			</zipfileset>
+			<rule pattern="org.fest.**" result="de.fips.util.tinybinding.lib.org.fest.@1" />
+			<fileset dir="." includes="LICENSE" />
+			<fileset dir="." includes="FEST_LICENSE" />
+		</jarjar>
+		<property name="tinybinding.dist.built" value="true" />
+	</target>
+
+	<!-- test -->
+	<path id="test.path">
+		<fileset dir="lib/test">
+			<include name="*.jar" />
+		</fileset>
+	</path>
 </project>

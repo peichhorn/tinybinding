@@ -1,29 +1,28 @@
 /*
-Copyright © 2010-2011 Philipp Eichhorn.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
+ * Copyright © 2010-2011 Philipp Eichhorn.
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package de.fips.util.tinybinding.pojo;
 
-import static org.fest.reflect.core.Reflection.method;
 import static org.fest.reflect.core.Reflection.property;
-import static de.fips.util.tinybinding.WeakReferences.weakListener;
+import static de.fips.util.tinybinding.WeakListeners.addWeak;
 import static de.fips.util.tinybinding.util.Cast.uncheckedCast;
 import static de.fips.util.tinybinding.util.Reflection.getPrimitive;
 import static de.fips.util.tinybinding.util.Reflection.hasPrimitive;
@@ -34,7 +33,7 @@ import java.beans.PropertyChangeListener;
 import org.fest.reflect.beanproperty.Invoker;
 import org.fest.reflect.exception.ReflectionError;
 
-import de.fips.util.tinybinding.WeakReferences;
+import de.fips.util.tinybinding.WeakListeners;
 import de.fips.util.tinybinding.impl.ObservableValue;
 import de.fips.util.tinybinding.util.Cast;
 
@@ -50,7 +49,7 @@ import de.fips.util.tinybinding.util.Cast;
  * so it gets garbage collected when the time comes.
  *
  * @param <TYPE> Type of the observed POJO field
- * @see WeakReferences
+ * @see WeakListeners
  * @author Philipp Eichhorn
  */
 class PojoObservableValue<TYPE> extends ObservableValue<TYPE> implements PropertyChangeListener {
@@ -64,17 +63,18 @@ class PojoObservableValue<TYPE> extends ObservableValue<TYPE> implements Propert
 		this.propertyName = propertyName;
 		this.propertyType = propertyType;
 		try {
-			method("addPropertyChangeListener").withParameterTypes(String.class, PropertyChangeListener.class).in(pojo) //
-				.invoke(propertyName, weakListener(PropertyChangeListener.class, this).createFor(pojo));
-		} catch (ReflectionError ignore) {
-			// ignore
+			addWeak(PropertyChangeListener.class, this).withPropertyName(propertyName).toTarget(pojo);
+		} catch (IllegalStateException e) {
+			addWeak(PropertyChangeListener.class, this).toTargetIfPossible(pojo);
 		}
 		guardedSetValue(getPojoValue());
 	}
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
-		guardedSetValue(Cast.<TYPE>uncheckedCast(event.getNewValue()));
+		if (propertyName.equals(event.getPropertyName())) { 
+			guardedSetValue(Cast.<TYPE>uncheckedCast(event.getNewValue()));
+		}
 	}
 
 	protected void guardedSetValue(final TYPE value) {
