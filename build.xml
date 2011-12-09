@@ -49,8 +49,8 @@ the common tasks and can be called on to run the main aspects of all the sub-scr
 	<!-- IDE integration -->
 	<target name="eclipse" depends="deps" description="Creates eclipse project files and downloads all dependencies. Open this directory as project in eclipse after running this target.">
 		<ivy:eclipsegen source="1.6">
-			<srcdir dir="src/core" />
-			<srcdir dir="test/core" />
+			<srcdir dir="src/main/java" />
+			<srcdir dir="src/test/java" />
 			<conf name="build" sources="contrib" />
 			<conf name="test" sources="contrib" />
 			<settings>
@@ -84,7 +84,7 @@ the common tasks and can be called on to run the main aspects of all the sub-scr
 
 	<target name="compile" depends="ensureBuildDeps" description="Compiles the code.">
 		<ivy:compile destdir="build/tinybinding" source="1.6" target="1.6" includeantruntime="false">
-			<src path="src/core" />
+			<src path="src/main/java" />
 			<classpath location="build/tinybinding" />
 			<classpath refid="build.path" />
 		</ivy:compile>
@@ -93,7 +93,7 @@ the common tasks and can be called on to run the main aspects of all the sub-scr
 	<!-- version -->
 	<target name="version" depends="ensure-ipp" description="Shows the version number." unless="tinybinding.version">
 		<mkdir dir="build/tinybinding" />
-		<javac includeDestClasses="false" srcdir="src/core" debug="on" destdir="build/tinybinding" source="1.6" target="1.6" includes="de/fips/util/tinybinding/Version.java" includeantruntime="false" />
+		<javac includeDestClasses="false" srcdir="src/main/java" debug="on" destdir="build/tinybinding" source="1.6" target="1.6" includes="de/fips/util/tinybinding/Version.java" includeantruntime="false" />
 		<java classname="de.fips.util.tinybinding.Version" classpath="build/tinybinding" failonerror="true" output="build/version.txt" />
 		<ivy:loadversion property="tinybinding.version" file="build/version.txt" />
 		<echo level="info">tinybinding version: ${tinybinding.version}</echo>
