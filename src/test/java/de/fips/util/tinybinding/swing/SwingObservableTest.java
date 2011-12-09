@@ -260,6 +260,7 @@ public class SwingObservableTest {
 		text.addObserver(observer);
 		verify(observer, times(1)).valueChanged(any(String.class), eq((String) null));
 		inEDT(textArea).setText("TextComponent Text");
+		window.robot.waitForIdle();
 		verify(observer, times(1)).valueChanged(eq("TextComponent Text"), any(String.class));
 		inEDT((JTextArea) textArea).replaceRange("", 1, 5);
 		window.robot.waitForIdle();
@@ -275,6 +276,7 @@ public class SwingObservableTest {
 		text.addObserver(observer);
 		verify(observer, times(1)).valueChanged(any(String.class), eq((String) null));
 		inEDT(textArea).setText("TextComponent Text");
+		window.robot.waitForIdle();
 		verify(observer, times(1)).valueChanged(eq("TextComponent Text"), any(String.class));
 		final StringContent content = new StringContent();
 		content.insertString(0, "TextComponent new Document");
@@ -305,6 +307,7 @@ public class SwingObservableTest {
 		value.addObserver(observer);
 		verify(observer, times(1)).valueChanged(any(String.class), eq((String) null));
 		inEDT(combobox).setSelectedIndex(1);
+		window.robot.waitForIdle();
 		verify(observer, times(1)).valueChanged(eq("Value 2"), any(String.class));
 		final DefaultComboBoxModel model = new DefaultComboBoxModel();
 		model.addElement("Value a");
@@ -326,6 +329,7 @@ public class SwingObservableTest {
 		value.addObserver(observer);
 		verify(observer, times(1)).valueChanged(any(Long.class), eq((Long) null));
 		inEDT(spinner).setValue(Long.valueOf(10));
+		window.robot.waitForIdle();
 		verify(observer, times(1)).valueChanged(eq(Long.valueOf(10)), any(Long.class));
 	}
 
@@ -338,6 +342,7 @@ public class SwingObservableTest {
 		value.addObserver(observer);
 		verify(observer, times(1)).valueChanged(any(String.class), eq((String) null));
 		inEDT(list).setSelectedValue("Item 2", true);
+		window.robot.waitForIdle();
 		verify(observer, times(1)).valueChanged(eq("Item 2"), any(String.class));
 	}
 
