@@ -26,6 +26,7 @@ import static org.fest.reflect.util.Accessibles.*;
 
 import java.awt.Container;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.SneakyThrows;
+import lombok.Validate;
+import lombok.Validate.NotNull;
 
 /**
  * Object that is capable of automatically binding {@link Bindable @Bindable}- and
@@ -77,9 +81,8 @@ public final class AutoBinder {
 		return new AutoBinder().bindPojo(pojoA, pojoB);
 	}
 
-	private IBindingContext bindPojo(final Object pojoA, final Object pojoB) throws UnresolvedBindingException {
-		verifyNotNull(pojoA, "pojoA");
-		verifyNotNull(pojoB, "pojoB");
+	@Validate
+	private IBindingContext bindPojo(@NotNull Object pojoA, @NotNull final Object pojoB) throws UnresolvedBindingException {
 		final Map<String, BindingData> bindingsA = bindableFieldsOf(pojoA);
 		final Map<String, BindingData> bindingsB = bindableFieldsOf(pojoB);
 		final IBindingContext context = BindingContexts.defaultContext();
@@ -96,7 +99,8 @@ public final class AutoBinder {
 		return context;
 	}
 
-	private IObservableValue<?> observableValueFor(final Object pojo, final BindingData binding) throws UnresolvedBindingException {
+	@SneakyThrows
+	private IObservableValue<?> observableValueFor(final Object pojo, final BindingData binding) {
 		final Field field = binding.getField();
 		final boolean accessible = field.isAccessible();
 		try {
@@ -111,8 +115,8 @@ public final class AutoBinder {
 				observableValue = Observables.observe(pojo).property(field.getName(), type);
 			}
 			return observableValue;
-		} catch (Exception e) {
-			throw new UnresolvedBindingException(e);
+		} catch (InvocationTargetException e) {
+			throw e.getTargetException();
 		} finally {
 			setAccessibleIgnoringExceptions(field, accessible);
 		}
@@ -183,11 +187,6 @@ public final class AutoBinder {
 
 	private String fieldSignature(final Field field) {
 		return field.getType().getName() + " " + field.getName();
-	}
-
-	private void verifyNotNull(final Object object, final String objectName) {
-		if (object == null)
-			throw invalid("'%s' may not be null.", objectName);
 	}
 
 	private IllegalArgumentException invalid(final String message, final Object... args) {

@@ -33,6 +33,11 @@ public class ExpectedException implements TestRule {
 	@Delegate
 	private final org.junit.rules.ExpectedException delegate = org.junit.rules.ExpectedException.none();
 
+	public void expectNullPointerException(String message) {
+		expect(NullPointerException.class);
+		expectMessage(message);
+	}
+
 	public void expectIllegalArgumentException(String message) {
 		expect(IllegalArgumentException.class);
 		expectMessage(message);

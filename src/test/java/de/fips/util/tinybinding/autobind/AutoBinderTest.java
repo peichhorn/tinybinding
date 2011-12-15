@@ -160,13 +160,13 @@ public class AutoBinderTest {
 
 	@Test
 	public void test_bind_modelIsNull() throws Exception {
-		thrown.expectIllegalArgumentException("'pojoA' may not be null.");
+		thrown.expectNullPointerException("The validated object 'pojoA' (argument #1) is null");
 		context = AutoBinder.bind(null, form2);
 	}
 
 	@Test
 	public void test_bind_formIsNull() throws Exception {
-		thrown.expectIllegalArgumentException("'pojoB' may not be null.");
+		thrown.expectNullPointerException("The validated object 'pojoB' (argument #2) is null");
 		context = AutoBinder.bind(model1, null);
 	}
 

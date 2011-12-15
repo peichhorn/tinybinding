@@ -29,16 +29,6 @@ public class UnresolvedBindingException extends Exception {
 	private static final long serialVersionUID = 4600777691375193596L;
 
 	/**
-	 * Constructs with a specified cause.
-	 * 
-	 * @param cause
-	 *            the cause.
-	 */
-	public UnresolvedBindingException(Throwable t) {
-		super(t);
-	}
-
-	/**
 	 * Constructor with a detail message.
 	 * 
 	 * @param s
