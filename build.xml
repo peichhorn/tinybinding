@@ -129,4 +129,29 @@ the common tasks and can be called on to run the main aspects of all the sub-scr
 			<include name="*.jar" />
 		</fileset>
 	</path>
+
+	<target name="test-compile" depends="ensureTestDeps, compile" unless="skipTests">
+		<mkdir dir="build/tests" />
+		<ivy:compile destdir="build/tests" source="1.6" target="1.6" includeantruntime="false">
+			<classpath refid="test.path" />
+			<classpath refid="build.path" />
+			<classpath path="build/tinybinding" />
+			<src path="src/test/java" />
+		</ivy:compile>
+	</target>
+
+	<target name="test" depends="test-compile, dist" unless="tests.skip" description="Runs the tests.">
+		<junit haltonfailure="yes" fork="true">
+			<formatter type="plain" usefile="false" unless="tests.quiet" />
+			<classpath refid="test.path" />
+			<classpath path="dist/tinybinding.jar" />
+			<classpath path="build/tests" />
+			<batchtest>
+				<fileset dir="src/test/java">
+					<include name="**/*Test*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+		<echo level="info">All tests successful.</echo>
+	</target>
 </project>
