@@ -21,8 +21,6 @@
  */
 package de.fips.util.tinybinding;
 
-import static lombok.With.with;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -40,7 +38,7 @@ import lombok.SwingInvokeLater;
 public class DemoLauncher implements Application {
 
 	public static Class<?>[] getDemoClasses() {
-		return new Class<?>[] {SimpleDemo.class, SearchDemo.class};
+		return new Class<?>[] { SimpleDemo.class, SearchDemo.class };
 	}
 
 	public ComboBoxModel getComboBoxModel() {
@@ -56,14 +54,13 @@ public class DemoLauncher implements Application {
 		final JComboBox combobox = new JComboBox();
 		combobox.setPreferredSize(new Dimension(150, combobox.getPreferredSize().height));
 		combobox.setModel(getComboBoxModel());
-		with(new JFrame("DemoLauncher"),
-			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE),
-			setLayout(new BorderLayout(5, 5)),
-			getContentPane().add(combobox, BorderLayout.WEST),
-			getContentPane().add(new JButton(new LaunchAction(combobox)), BorderLayout.EAST),
-			pack(),
-			setVisible(true));
-
+		final JFrame frame = new JFrame("DemoLauncher");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLayout(new BorderLayout(5, 5));
+		frame.getContentPane().add(combobox, BorderLayout.WEST);
+		frame.getContentPane().add(new JButton(new LaunchAction(combobox)), BorderLayout.EAST);
+		frame.pack();
+		frame.setVisible(true);
 	}
 
 	public static class LaunchAction extends AbstractAction {
@@ -80,7 +77,7 @@ public class DemoLauncher implements Application {
 		public void actionPerformed(ActionEvent event) {
 			Class<?> clazz = getDemoClasses()[combobox.getSelectedIndex()];
 			try {
-				clazz.getMethod("main", String[].class).invoke(null, new Object[] {new String[0]});
+				clazz.getMethod("main", String[].class).invoke(null, new Object[] { new String[0] });
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

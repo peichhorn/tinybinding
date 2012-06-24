@@ -23,7 +23,6 @@ package de.fips.util.tinybinding;
 
 import static de.fips.util.tinybinding.Bindings.bind;
 import static de.fips.util.tinybinding.Observables.observe;
-import static lombok.With.with;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;
@@ -56,12 +55,12 @@ public class SearchDemo implements Application {
 
 	@SwingInvokeLater
 	public void runApp(final String[] args) throws Throwable {
-		with(new JFrame("Search Demo"),
-			setLayout(new BorderLayout()),
-			getContentPane().add(new SearchDemoViewLogic().createView(), BorderLayout.CENTER),
-			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE),
-			pack(),
-			setVisible(true));
+		final JFrame frame = new JFrame("Search Demo");
+		frame.setLayout(new BorderLayout());
+		frame.getContentPane().add(new SearchDemoViewLogic().createView(), BorderLayout.CENTER);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.pack();
+		frame.setVisible(true);
 	}
 
 	public static class SearchDemoView extends JPanel {

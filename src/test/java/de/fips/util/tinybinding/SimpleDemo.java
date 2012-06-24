@@ -22,7 +22,6 @@
 package de.fips.util.tinybinding;
 
 import static javax.swing.JOptionPane.*;
-import static lombok.With.with;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -56,14 +55,14 @@ public class SimpleDemo implements Application {
 		final LoginForm form = new LoginForm();
 		final LoginModel model = new LoginModel();
 		AutoBinder.bind(model, form);
-		with(new JFrame("Simple Demo"),
-			setLayout(new BorderLayout()),
-			getContentPane().add(form, BorderLayout.CENTER),
-			getContentPane().add(new JButton(new LoginAction(model)), BorderLayout.SOUTH),
-			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE),
-			pack(),
-			setResizable(false),
-			setVisible(true));
+		final JFrame frame = new JFrame("Simple Demo");
+		frame.setLayout(new BorderLayout());
+		frame.getContentPane().add(form, BorderLayout.CENTER);
+		frame.getContentPane().add(new JButton(new LoginAction(model)), BorderLayout.SOUTH);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.pack();
+		frame.setResizable(false);
+		frame.setVisible(true);
 	}
 
 	public static class LoginAction extends AbstractAction {
@@ -93,11 +92,11 @@ public class SimpleDemo implements Application {
 	public static class LoginForm extends JPanel {
 		private static final long serialVersionUID = 7239761542065605502L;
 
-		@SwingBindable(hint="text")
+		@SwingBindable(hint = "text")
 		private final JTextField loginName = new JTextField();
-		@SwingBindable(hint="text")
+		@SwingBindable(hint = "text")
 		private final JPasswordField password = new JPasswordField();
-		@SwingBindable(hint="selected")
+		@SwingBindable(hint = "selected")
 		private final JCheckBox autologin = new JCheckBox("Auto Login");
 
 		public LoginForm() {
@@ -111,7 +110,8 @@ public class SimpleDemo implements Application {
 		}
 	}
 
-	@BoundSetter @Getter
+	@BoundSetter
+	@Getter
 	@BoundPropertySupport
 	public static class LoginModel {
 		@Bindable
