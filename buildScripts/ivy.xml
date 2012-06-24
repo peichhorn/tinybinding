@@ -11,7 +11,7 @@
     <dependency org="junit" name="junit" rev="4.10" conf="test->default; contrib->sources" />
     <dependency org="org.mockito" name="mockito-all" rev="1.8.5" conf="test->default; contrib->sources" />
     <dependency org="org.easytesting" name="fest-assert" rev="1.2" conf="test->default; contrib->sources" transitive="false" />
-    <dependency org="abbot" name="abbot" rev="1.0.2" conf="test->default" />
+    <dependency org="abbot" name="abbot" rev="1.2.0" conf="test" />
     
     <dependency org="com.github.peichhorn" name="lombok-pg" rev="0.11.0" conf="build->default" />
     
